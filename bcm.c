@@ -56,6 +56,7 @@
 #include <linux/can.h>
 #include <linux/can/core.h>
 #include <linux/can/bcm.h>
+#include <linux/slab.h>
 #include <net/sock.h>
 #include <net/net_namespace.h>
 
@@ -712,8 +713,6 @@ static void bcm_remove_op(struct bcm_op *op)
 		kfree(op->last_frames);
 
 	kfree(op);
-
-	return;
 }
 
 static void bcm_rx_unreg(struct net_device *dev, struct bcm_op *op)
