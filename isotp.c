@@ -85,10 +85,21 @@ MODULE_ALIAS("can-proto-6");
 
 /* ISO 15765-2:2016 supports more than 4095 byte per ISO PDU as the FF_DL can
  * take full 32 bit values (4 Gbyte). We would need some good concept to handle
- * this between user space and kernel space. For now increase the static buffer
- * to something about 64 kbyte to be able to test this new functionality.
+ * this between user space and kernel space. For now set the static buffer to
+ * something about 8 kbyte to be able to test this new functionality.
  */
-#define MAX_MSG_LENGTH 66000
+#define DEFAULT_MAX_PDU_SIZE 8300
+
+/* maximum PDU size before ISO 15765-2:2016 extension was 4095 */
+#define MAX_12BIT_PDU_SIZE 4095
+
+/* limit the isotp pdu size from the optional module parameter to 1MByte */
+#define MAX_PDU_SIZE (1025 * 1024U)
+
+static unsigned int max_pdu_size __read_mostly = DEFAULT_MAX_PDU_SIZE;
+module_param(max_pdu_size, uint, 0444);
+MODULE_PARM_DESC(max_pdu_size, "maximum isotp pdu size (default "
+		 __stringify(DEFAULT_MAX_PDU_SIZE) ")");
 
 /* N_PCI type values in bits 7-4 of N_PCI bytes */
 #define N_PCI_SF 0x00	/* single frame */
@@ -123,13 +134,15 @@ enum {
 };
 
 struct tpcon {
-	unsigned int idx;
+	u8 *buf;
+	unsigned int buflen;
 	unsigned int len;
+	unsigned int idx;
 	u32 state;
 	u8 bs;
 	u8 sn;
 	u8 ll_dl;
-	u8 buf[MAX_MSG_LENGTH + 1];
+	u8 sbuf[DEFAULT_MAX_PDU_SIZE];
 };
 
 struct isotp_sock {
@@ -140,7 +153,7 @@ struct isotp_sock {
 	canid_t rxid;
 	ktime_t tx_gap;
 	ktime_t lastrxcf_tstamp;
-	struct hrtimer rxtimer, txtimer;
+	struct hrtimer rxtimer, txtimer, txfrtimer;
 	struct can_isotp_options opt;
 	struct can_isotp_fc_options rxfc, txfc;
 	struct can_isotp_ll_options ll;
@@ -503,7 +516,17 @@ static int isotp_rcv_ff(struct sock *sk, struct canfd_frame *cf, int ae)
 	if (so->rx.len + ae + off + ff_pci_sz < so->rx.ll_dl)
 		return 1;
 
-	if (so->rx.len > MAX_MSG_LENGTH) {
+	/* PDU size > default => try max_pdu_size */
+	if (so->rx.len > so->rx.buflen && so->rx.buflen < max_pdu_size) {
+		u8 *newbuf = kmalloc(max_pdu_size, GFP_ATOMIC);
+
+		if (newbuf) {
+			so->rx.buf = newbuf;
+			so->rx.buflen = max_pdu_size;
+		}
+	}
+
+	if (so->rx.len > so->rx.buflen) {
 		/* send FC frame with overflow status */
 		isotp_send_fc(sk, ae, ISOTP_FC_OVFLW);
 		return 1;
@@ -807,7 +830,7 @@ static void isotp_create_fframe(struct canfd_frame *cf, struct isotp_sock *so,
 		cf->data[0] = so->opt.ext_address;
 
 	/* create N_PCI bytes with 12/32 bit FF_DL data length */
-	if (so->tx.len > 4095) {
+	if (so->tx.len > MAX_12BIT_PDU_SIZE) {
 		/* use 32 bit FF_DL notation */
 		cf->data[ae] = N_PCI_FF;
 		cf->data[ae + 1] = 0;
@@ -871,7 +894,7 @@ static void isotp_rcv_echo(struct sk_buff *skb, void *data)
 	}
 
 	/* start timer to send next consecutive frame with correct delay */
-	hrtimer_start(&so->txtimer, so->tx_gap, HRTIMER_MODE_REL_SOFT);
+	hrtimer_start(&so->txfrtimer, so->tx_gap, HRTIMER_MODE_REL_SOFT);
 }
 
 static enum hrtimer_restart isotp_tx_timer_handler(struct hrtimer *hrtimer)
@@ -879,49 +902,39 @@ static enum hrtimer_restart isotp_tx_timer_handler(struct hrtimer *hrtimer)
 	struct isotp_sock *so = container_of(hrtimer, struct isotp_sock,
 					     txtimer);
 	struct sock *sk = &so->sk;
-	enum hrtimer_restart restart = HRTIMER_NORESTART;
 
-	switch (so->tx.state) {
-	case ISOTP_SENDING:
+	/* don't handle timeouts in IDLE state */
+	if (so->tx.state == ISOTP_IDLE)
+		return HRTIMER_NORESTART;
 
-		/* cfecho should be consumed by isotp_rcv_echo() here */
-		if (!so->cfecho) {
-			/* start timeout for unlikely lost echo skb */
-			hrtimer_set_expires(&so->txtimer,
-					    ktime_add(ktime_get(),
-						      ktime_set(ISOTP_ECHO_TIMEOUT, 0)));
-			restart = HRTIMER_RESTART;
+	/* we did not get any flow control or echo frame in time */
 
-			/* push out the next consecutive frame */
-			isotp_send_cframe(so);
-			break;
-		}
+	/* report 'communication error on send' */
+	sk->sk_err = ECOMM;
+	if (!sock_flag(sk, SOCK_DEAD))
+		sk_error_report(sk);
 
-		/* cfecho has not been cleared in isotp_rcv_echo() */
-		pr_notice_once("can-isotp: cfecho %08X timeout\n", so->cfecho);
-		fallthrough;
+	/* reset tx state */
+	so->tx.state = ISOTP_IDLE;
+	wake_up_interruptible(&so->wait);
 
-	case ISOTP_WAIT_FC:
-	case ISOTP_WAIT_FIRST_FC:
+	return HRTIMER_NORESTART;
+}
 
-		/* we did not get any flow control frame in time */
+static enum hrtimer_restart isotp_txfr_timer_handler(struct hrtimer *hrtimer)
+{
+	struct isotp_sock *so = container_of(hrtimer, struct isotp_sock,
+					     txfrtimer);
 
-		/* report 'communication error on send' */
-		sk->sk_err = ECOMM;
-		if (!sock_flag(sk, SOCK_DEAD))
-			sk_error_report(sk);
+	/* start echo timeout handling and cover below protocol error */
+	hrtimer_start(&so->txtimer, ktime_set(ISOTP_ECHO_TIMEOUT, 0),
+		      HRTIMER_MODE_REL_SOFT);
 
-		/* reset tx state */
-		so->tx.state = ISOTP_IDLE;
-		wake_up_interruptible(&so->wait);
-		break;
+	/* cfecho should be consumed by isotp_rcv_echo() here */
+	if (so->tx.state == ISOTP_SENDING && !so->cfecho)
+		isotp_send_cframe(so);
 
-	default:
-		WARN_ONCE(1, "can-isotp: tx timer state %08X cfecho %08X\n",
-			  so->tx.state, so->cfecho);
-	}
-
-	return restart;
+	return HRTIMER_NORESTART;
 }
 
 static int isotp_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
@@ -957,7 +970,17 @@ static int isotp_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 		so->tx.state = ISOTP_SENDING;
 	}
 
-	if (!size || size > MAX_MSG_LENGTH) {
+	/* PDU size > default => try max_pdu_size */
+	if (size > so->tx.buflen && so->tx.buflen < max_pdu_size) {
+		u8 *newbuf = kmalloc(max_pdu_size, GFP_KERNEL);
+
+		if (newbuf) {
+			so->tx.buf = newbuf;
+			so->tx.buflen = max_pdu_size;
+		}
+	}
+
+	if (!size || size > so->tx.buflen) {
 		err = -EINVAL;
 		goto err_out_drop;
 	}
@@ -1162,6 +1185,10 @@ static int isotp_release(struct socket *sock)
 	/* wait for complete transmission of current pdu */
 	wait_event_interruptible(so->wait, so->tx.state == ISOTP_IDLE);
 
+	/* force state machines to be idle also when a signal occurred */
+	so->tx.state = ISOTP_IDLE;
+	so->rx.state = ISOTP_IDLE;
+
 	spin_lock(&isotp_notifier_lock);
 	while (isotp_busy_notifier == so) {
 		spin_unlock(&isotp_notifier_lock);
@@ -1194,11 +1221,18 @@ static int isotp_release(struct socket *sock)
 		}
 	}
 
+	hrtimer_cancel(&so->txfrtimer);
 	hrtimer_cancel(&so->txtimer);
 	hrtimer_cancel(&so->rxtimer);
 
 	so->ifindex = 0;
 	so->bound = 0;
+
+	if (so->rx.buf != so->rx.sbuf)
+		kfree(so->rx.buf);
+
+	if (so->tx.buf != so->tx.sbuf)
+		kfree(so->tx.buf);
 
 	sock_orphan(sk);
 	sock->sk = NULL;
@@ -1596,10 +1630,17 @@ static int isotp_init(struct sock *sk)
 	so->rx.state = ISOTP_IDLE;
 	so->tx.state = ISOTP_IDLE;
 
+	so->rx.buf = so->rx.sbuf;
+	so->tx.buf = so->tx.sbuf;
+	so->rx.buflen = ARRAY_SIZE(so->rx.sbuf);
+	so->tx.buflen = ARRAY_SIZE(so->tx.sbuf);
+
 	hrtimer_init(&so->rxtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
 	so->rxtimer.function = isotp_rx_timer_handler;
 	hrtimer_init(&so->txtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
 	so->txtimer.function = isotp_tx_timer_handler;
+	hrtimer_init(&so->txfrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
+	so->txfrtimer.function = isotp_txfr_timer_handler;
 
 	init_waitqueue_head(&so->wait);
 	spin_lock_init(&so->rx_lock);
@@ -1661,7 +1702,10 @@ static __init int isotp_module_init(void)
 {
 	int err;
 
-	pr_info("can: isotp protocol\n");
+	max_pdu_size = max_t(unsigned int, max_pdu_size, MAX_12BIT_PDU_SIZE);
+	max_pdu_size = min_t(unsigned int, max_pdu_size, MAX_PDU_SIZE);
+
+	pr_info("can: isotp protocol (max_pdu_size %d)\n", max_pdu_size);
 
 	err = can_proto_register(&isotp_can_proto);
 	if (err < 0)
