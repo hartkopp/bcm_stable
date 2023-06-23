@@ -1112,9 +1112,8 @@ wait_free_buffer:
 		if (err)
 			goto err_event_drop;
 
-		err = sock_error(sk);
-		if (err)
-			return err;
+		if (sk->sk_err)
+			return -sk->sk_err;
 	}
 
 	return size;
@@ -1700,7 +1699,6 @@ static const struct proto_ops isotp_ops = {
 	.sendmsg = isotp_sendmsg,
 	.recvmsg = isotp_recvmsg,
 	.mmap = sock_no_mmap,
-	.sendpage = sock_no_sendpage,
 };
 
 static struct proto isotp_proto __read_mostly = {
