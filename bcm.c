@@ -1011,12 +1011,13 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 		op->ifindex = ifindex;
 
 		/* initialize uninitialized (kzalloc) structure */
-		hrtimer_setup(&op->timer, bcm_tx_timeout_handler, CLOCK_MONOTONIC,
-			      HRTIMER_MODE_REL_SOFT);
+		hrtimer_init(&op->timer, CLOCK_MONOTONIC,
+			     HRTIMER_MODE_REL_SOFT);
+		op->timer.function = bcm_tx_timeout_handler;
 
 		/* currently unused in tx_ops */
-		hrtimer_setup(&op->thrtimer, hrtimer_dummy_timeout, CLOCK_MONOTONIC,
-			      HRTIMER_MODE_REL_SOFT);
+		hrtimer_init(&op->thrtimer, CLOCK_MONOTONIC,
+			     HRTIMER_MODE_REL_SOFT);
 
 		/* add this bcm_op to the list of the tx_ops */
 		list_add(&op->list, &bo->tx_ops);
@@ -1191,10 +1192,13 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
 		op->rx_ifindex = ifindex;
 
 		/* initialize uninitialized (kzalloc) structure */
-		hrtimer_setup(&op->timer, bcm_rx_timeout_handler, CLOCK_MONOTONIC,
-			      HRTIMER_MODE_REL_SOFT);
-		hrtimer_setup(&op->thrtimer, bcm_rx_thr_handler, CLOCK_MONOTONIC,
-			      HRTIMER_MODE_REL_SOFT);
+		hrtimer_init(&op->timer, CLOCK_MONOTONIC,
+			     HRTIMER_MODE_REL_SOFT);
+		op->timer.function = bcm_rx_timeout_handler;
+
+		hrtimer_init(&op->thrtimer, CLOCK_MONOTONIC,
+			     HRTIMER_MODE_REL_SOFT);
+		op->thrtimer.function = bcm_rx_thr_handler;
 
 		/* add this bcm_op to the list of the rx_ops */
 		list_add(&op->list, &bo->rx_ops);
@@ -1621,6 +1625,7 @@ static int bcm_release(struct socket *sock)
 	sock->sk = NULL;
 
 	release_sock(sk);
+	sock_prot_inuse_add(net, sk->sk_prot, -1);
 	sock_put(sk);
 
 	return 0;
