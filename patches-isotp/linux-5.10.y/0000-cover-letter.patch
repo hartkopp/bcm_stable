@@ -1,0 +1,51 @@
+From fc52e0d62d024b755721e7146c5eb6c21d499e7c Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072055-errand-ending-927c@gregkh>
+References: <2026072055-errand-ending-927c@gregkh>
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+Date: Wed, 22 Jul 2026 13:57:11 +0000
+Subject: [PATCH 5.10.y 0/2] can: isotp: backport of 2 patches that failed to
+ apply to 5.10-stable
+
+This resubmits "can: isotp: fix use-after-free race with concurrent
+NETDEV_UNREGISTER" (commit 20bab8b88baac140ca3701116e1d486c7f51e311
+upstream), which failed to apply to the 5.10-stable tree, together
+with "can: isotp: serialize TX state transitions under so->rx_lock"
+(commit cf070fe33bfbd1a4c21236078fadb35dd223a157 upstream) from the
+same upstream series, which builds on it and would otherwise fail
+for the same reason. This is the full set of 3 upstream isotp.c
+patches from 7.2-rc3 minus the 1 already queued by the normal stable
+process for 5.10 ("can: isotp: use unconditional synchronize_rcu()
+in isotp_release()").
+
+Both patches needed the same kind of adaptation already used for the
+bcm.c patches on this branch: upstream's context in a few spots
+includes code from unrelated, not-backported feature/refactor
+commits that are not Cc: stable and not present on 5.10:
+
+- the dynamic max_pdu_size TX buffer resize (commits 2f2dd39 "can:
+  isotp: set max PDU size to 64 kByte", 2022, and 973bb01 "can:
+  isotp: add module parameter for maximum pdu size", 2023)
+- the hrtimer_setup() API consolidation (unrelated, generic hrtimer
+  API change)
+- the sk_error_report() wrapper (generic socket core API, not
+  present here; kept sk->sk_error_report(sk) as used everywhere else
+  in this file)
+
+The corresponding hunks are omitted or adapted to the older code
+shape; the actual race fixes themselves are unaffected and fully
+applied. See each patch's changelog for the exact adaptation.
+
+This assumes the 1 already-queued isotp.c patch for 5.10-stable has
+landed by the time this is applied. If not, please let me know and I
+will rebase.
+
+Oliver Hartkopp (2):
+  can: isotp: fix use-after-free race with concurrent NETDEV_UNREGISTER
+  can: isotp: serialize TX state transitions under so->rx_lock
+
+ isotp.c | 281 +++++++++++++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 214 insertions(+), 67 deletions(-)
+
+--
+2.43.0
+
