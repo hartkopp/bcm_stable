@@ -1,0 +1,113 @@
+Subject: Patch "can: bcm: fix data race on rx_stamp/rx_ifindex in bcm_rx_handler()" has been added to the 7.1-stable tree
+To: gregkh@linuxfoundation.org,mkl@pengutronix.de,sashiko-bot@kernel.org,socketcan@hartkopp.net,stable@kernel.org
+Cc: <stable-commits@vger.kernel.org>
+From: <gregkh@linuxfoundation.org>
+Date: Mon, 20 Jul 2026 17:24:02 +0200
+Message-ID: <2026072002-sandbag-skylight-c879@gregkh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: 8bit
+
+
+This is a note to let you know that I've just added the patch titled
+
+    can: bcm: fix data race on rx_stamp/rx_ifindex in bcm_rx_handler()
+
+to the 7.1-stable tree which can be found at:
+    http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
+
+The filename of the patch is:
+     can-bcm-fix-data-race-on-rx_stamp-rx_ifindex-in-bcm_rx_handler.patch
+and it can be found in the queue-7.1 subdirectory.
+
+If you, or anyone else, feels it should not be added to the stable tree,
+please let <stable@vger.kernel.org> know about it.
+
+
+From 58fd6cbc8541216af1d7ed272ea7ac2b66d50fd8 Mon Sep 17 00:00:00 2001
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+Date: Tue, 14 Jul 2026 18:55:32 +0200
+Subject: can: bcm: fix data race on rx_stamp/rx_ifindex in bcm_rx_handler()
+
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+
+commit 58fd6cbc8541216af1d7ed272ea7ac2b66d50fd8 upstream.
+
+For an rx op subscribed on all interfaces (ifindex == 0), the same op
+is registered once in the shared per-netns wildcard filter list, so
+bcm_rx_handler() can run concurrently on different CPUs for frames
+arriving on different net devices.
+
+op->rx_stamp and op->rx_ifindex were written before bcm_rx_update_lock was
+taken, allowing concurrent writers to race each other - including a torn
+store of the 64-bit rx_stamp on 32-bit platforms.
+
+Beyond a torn store bcm_send_to_user() must report the timestamp/ifindex
+of the very same frame whose content it is delivering. So the assignment
+is placed in the same unbroken bcm_rx_update_lock section as the content
+comparison.
+
+As a side effect, the RTR-request frame feature (which never reach
+bcm_send_to_user()) no longer updates rx_stamp/rx_ifindex, since only
+the notification path needs them.
+
+Fixes: ffd980f976e7 ("[CAN]: Add broadcast manager (bcm) protocol")
+Reported-by: sashiko-bot@kernel.org
+Closes: https://lore.kernel.org/linux-can/20260707145135.5BC831F00A3A@smtp.kernel.org/
+Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
+Link: https://patch.msgid.link/20260714-bcm_fixes-v15-10-562f7e3e42da@hartkopp.net
+Cc: stable@kernel.org
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ net/can/bcm.c |   13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+--- a/net/can/bcm.c
++++ b/net/can/bcm.c
+@@ -799,11 +799,6 @@ static void bcm_rx_handler(struct sk_buf
+ 	/* disable timeout */
+ 	hrtimer_cancel(&op->timer);
+ 
+-	/* save rx timestamp */
+-	op->rx_stamp = skb->tstamp;
+-	/* save originator for recvfrom() */
+-	op->rx_ifindex = skb->dev->ifindex;
+-
+ 	/* op->flags/op->frames may be updated concurrently by bcm_rx_setup() */
+ 	spin_lock_bh(&op->bcm_rx_update_lock);
+ 
+@@ -835,6 +830,14 @@ static void bcm_rx_handler(struct sk_buf
+ 			traffic_flags |= RX_OWN;
+ 	}
+ 
++	/* save rx timestamp and originator for recvfrom() under lock.
++	 * For an op subscribed on all interfaces (ifindex == 0)
++	 * bcm_rx_handler() can run concurrently on different CPUs so
++	 * the CAN content and the meta data must be bundled correctly.
++	 */
++	op->rx_stamp = skb->tstamp;
++	op->rx_ifindex = skb->dev->ifindex;
++
+ 	if (op->flags & RX_FILTER_ID) {
+ 		/* the easiest case */
+ 		bcm_rx_update_and_send(op, op->last_frames, rxframe,
+
+
+Patches currently in stable-queue which might be from socketcan@hartkopp.net are
+
+queue-7.1/can-bcm-track-a-single-source-interface-for-anydev-timeout-throttle-ops.patch
+queue-7.1/can-bcm-validate-frame-length-in-bcm_rx_setup-for-rtr-replies.patch
+queue-7.1/can-bcm-defer-rx_op-deallocation-to-workqueue-to-fix-thrtimer-uaf.patch
+queue-7.1/can-isotp-serialize-tx-state-transitions-under-so-rx_lock.patch
+queue-7.1/can-isotp-fix-use-after-free-race-with-concurrent-netdev_unregister.patch
+queue-7.1/alsa-hda-fix-kconfig-dependency-of-hd-audio-pci.patch
+queue-7.1/can-isotp-use-unconditional-synchronize_rcu-in-isotp_release.patch
+queue-7.1/can-bcm-fix-lockless-bound-ifindex-race-and-silent-rx_setup-failure.patch
+queue-7.1/can-bcm-extend-bcm_tx_lock-usage-for-data-and-timer-updates.patch
+queue-7.1/can-bcm-add-missing-rcu-list-annotations-and-operations.patch
+queue-7.1/can-bcm-add-missing-device-refcount-for-can-filter-removal.patch
+queue-7.1/can-bcm-add-locking-when-updating-filter-and-timer-values.patch
+queue-7.1/can-bcm-fix-can-frame-rx-tx-statistics.patch
+queue-7.1/can-bcm-fix-data-race-on-rx_stamp-rx_ifindex-in-bcm_rx_handler.patch
+queue-7.1/can-bcm-fix-stale-rx-tx-ops-after-device-removal.patch

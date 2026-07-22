@@ -1,0 +1,170 @@
+Subject: Patch "can: bcm: add missing device refcount for CAN filter removal" has been added to the 7.1-stable tree
+To: gregkh@linuxfoundation.org,mkl@pengutronix.de,sashiko-bot@kernel.org,socketcan@hartkopp.net,stable@kernel.org
+Cc: <stable-commits@vger.kernel.org>
+From: <gregkh@linuxfoundation.org>
+Date: Mon, 20 Jul 2026 17:24:02 +0200
+Message-ID: <2026072002-equity-hunting-1bef@gregkh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: 8bit
+
+
+This is a note to let you know that I've just added the patch titled
+
+    can: bcm: add missing device refcount for CAN filter removal
+
+to the 7.1-stable tree which can be found at:
+    http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
+
+The filename of the patch is:
+     can-bcm-add-missing-device-refcount-for-can-filter-removal.patch
+and it can be found in the queue-7.1 subdirectory.
+
+If you, or anyone else, feels it should not be added to the stable tree,
+please let <stable@vger.kernel.org> know about it.
+
+
+From d59948293ea34b6337ce2b5febab8510de70048c Mon Sep 17 00:00:00 2001
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+Date: Tue, 14 Jul 2026 18:55:30 +0200
+Subject: can: bcm: add missing device refcount for CAN filter removal
+
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+
+commit d59948293ea34b6337ce2b5febab8510de70048c upstream.
+
+sashiko-bot remarked a problem with a concurrent device unregistration
+in isotp.c which also is present in the bcm.c code. A former fix for raw.c
+commit c275a176e4b6 ("can: raw: add missing refcount for memory leak fix")
+introduced a netdevice_tracker which solves the issue for bcm.c too.
+
+bcm_release(), bcm_delete_rx_op() and bcm_notifier() relied on
+dev_get_by_index(ifindex) to re-find the device for an rx_op before
+unregistering its filter. If a concurrent NETDEV_UNREGISTER has already
+unlisted the device from the ifindex table, that lookup fails and
+can_rx_unregister() is silently skipped, leaving a stale CAN filter
+pointing at the soon-to-be-freed bcm_op/socket.
+
+Hold a netdev_hold()/netdev_put() tracked reference on op->rx_reg_dev
+from the moment the rx filter is registered in bcm_rx_setup() until it
+is unregistered in bcm_rx_unreg(), and use that reference directly in
+bcm_release() and bcm_delete_rx_op() instead of re-looking the device
+up by ifindex.
+
+Reported-by: sashiko-bot@kernel.org
+Closes: https://sashiko.dev/#/patchset/20260707094716.63578-1-socketcan@hartkopp.net
+Fixes: ffd980f976e7 ("[CAN]: Add broadcast manager (bcm) protocol")
+Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
+Link: https://patch.msgid.link/20260714-bcm_fixes-v15-8-562f7e3e42da@hartkopp.net
+Cc: stable@kernel.org
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ net/can/bcm.c |   47 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 20 deletions(-)
+
+--- a/net/can/bcm.c
++++ b/net/can/bcm.c
+@@ -129,6 +129,7 @@ struct bcm_op {
+ 	struct canfd_frame last_sframe;
+ 	struct sock *sk;
+ 	struct net_device *rx_reg_dev;
++	netdevice_tracker rx_reg_dev_tracker;
+ 	spinlock_t bcm_tx_lock; /* protect tx data and timer updates */
+ 	spinlock_t bcm_rx_update_lock; /* protect filter/timer data updates */
+ };
+@@ -967,6 +968,7 @@ static void bcm_rx_unreg(struct net_devi
+ 
+ 		/* mark as removed subscription */
+ 		op->rx_reg_dev = NULL;
++		netdev_put(dev, &op->rx_reg_dev_tracker);
+ 	} else
+ 		printk(KERN_ERR "can-bcm: bcm_rx_unreg: registered device "
+ 		       "mismatch %p %p\n", op->rx_reg_dev, dev);
+@@ -997,17 +999,14 @@ static int bcm_delete_rx_op(struct list_
+ 				 * Only remove subscriptions that had not
+ 				 * been removed due to NETDEV_UNREGISTER
+ 				 * in bcm_notifier()
++				 *
++				 * op->rx_reg_dev is a tracked reference taken
++				 * when the subscription was registered, so it
++				 * stays valid here even if a concurrent
++				 * NETDEV_UNREGISTER already unlisted the dev.
+ 				 */
+-				if (op->rx_reg_dev) {
+-					struct net_device *dev;
+-
+-					dev = dev_get_by_index(sock_net(op->sk),
+-							       op->ifindex);
+-					if (dev) {
+-						bcm_rx_unreg(dev, op);
+-						dev_put(dev);
+-					}
+-				}
++				if (op->rx_reg_dev)
++					bcm_rx_unreg(op->rx_reg_dev, op);
+ 			} else
+ 				can_rx_unregister(sock_net(op->sk), NULL,
+ 						  op->can_id,
+@@ -1539,7 +1538,17 @@ static int bcm_rx_setup(struct bcm_msg_h
+ 						      bcm_rx_handler, op,
+ 						      "bcm", sk);
+ 
+-				op->rx_reg_dev = dev;
++				/* keep a tracked reference so that a later
++				 * unregister can safely reach the device even
++				 * if a concurrent NETDEV_UNREGISTER has
++				 * already unlisted it by ifindex
++				 */
++				if (!err) {
++					op->rx_reg_dev = dev;
++					netdev_hold(dev,
++						    &op->rx_reg_dev_tracker,
++						    GFP_KERNEL);
++				}
+ 				dev_put(dev);
+ 			} else {
+ 				/* the requested device is gone - do not
+@@ -1949,16 +1958,14 @@ static int bcm_release(struct socket *so
+ 			 * Only remove subscriptions that had not
+ 			 * been removed due to NETDEV_UNREGISTER
+ 			 * in bcm_notifier()
++			 *
++			 * op->rx_reg_dev is a tracked reference taken
++			 * when the subscription was registered, so it
++			 * stays valid here even if a concurrent
++			 * NETDEV_UNREGISTER already unlisted the device.
+ 			 */
+-			if (op->rx_reg_dev) {
+-				struct net_device *dev;
+-
+-				dev = dev_get_by_index(net, op->ifindex);
+-				if (dev) {
+-					bcm_rx_unreg(dev, op);
+-					dev_put(dev);
+-				}
+-			}
++			if (op->rx_reg_dev)
++				bcm_rx_unreg(op->rx_reg_dev, op);
+ 		} else
+ 			can_rx_unregister(net, NULL, op->can_id,
+ 					  REGMASK(op->can_id),
+
+
+Patches currently in stable-queue which might be from socketcan@hartkopp.net are
+
+queue-7.1/can-bcm-track-a-single-source-interface-for-anydev-timeout-throttle-ops.patch
+queue-7.1/can-bcm-validate-frame-length-in-bcm_rx_setup-for-rtr-replies.patch
+queue-7.1/can-bcm-defer-rx_op-deallocation-to-workqueue-to-fix-thrtimer-uaf.patch
+queue-7.1/can-isotp-serialize-tx-state-transitions-under-so-rx_lock.patch
+queue-7.1/can-isotp-fix-use-after-free-race-with-concurrent-netdev_unregister.patch
+queue-7.1/alsa-hda-fix-kconfig-dependency-of-hd-audio-pci.patch
+queue-7.1/can-isotp-use-unconditional-synchronize_rcu-in-isotp_release.patch
+queue-7.1/can-bcm-fix-lockless-bound-ifindex-race-and-silent-rx_setup-failure.patch
+queue-7.1/can-bcm-extend-bcm_tx_lock-usage-for-data-and-timer-updates.patch
+queue-7.1/can-bcm-add-missing-rcu-list-annotations-and-operations.patch
+queue-7.1/can-bcm-add-missing-device-refcount-for-can-filter-removal.patch
+queue-7.1/can-bcm-add-locking-when-updating-filter-and-timer-values.patch
+queue-7.1/can-bcm-fix-can-frame-rx-tx-statistics.patch
+queue-7.1/can-bcm-fix-data-race-on-rx_stamp-rx_ifindex-in-bcm_rx_handler.patch
+queue-7.1/can-bcm-fix-stale-rx-tx-ops-after-device-removal.patch
