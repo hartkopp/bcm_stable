@@ -1,9 +1,7 @@
 From d5e74c61164933bc704608acd060be209bd30994 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072010-winner-hurried-07df@gregkh>
-References: <2026072010-winner-hurried-07df@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:26 +0200
-Subject: [PATCH 6.18.y 2/8] can: bcm: fix CAN frame rx/tx statistics
+Subject: [PATCH 2/8] can: bcm: fix CAN frame rx/tx statistics
 
 commit e6c24ba95fc3f1b5e1dcd28b1c6e59ef61a9daa5 upstream.
 

@@ -1,10 +1,8 @@
-From 716a7459df289bbd6c7a9e7f45cf5d406807119f Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072010-winner-hurried-07df@gregkh>
-References: <2026072010-winner-hurried-07df@gregkh>
+From 5966fc7e1ed04a036f2c45e7b51c49a1d74591e0 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:33 +0200
-Subject: [PATCH 6.18.y 8/8] can: bcm: track a single source interface for
- ANYDEV timeout/throttle ops
+Subject: [PATCH 8/8] can: bcm: track a single source interface for ANYDEV
+ timeout/throttle ops
 
 commit 2f5976f54a04e9f18b25283036ac3136be453b17 upstream.
 
@@ -48,7 +46,7 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
  1 file changed, 44 insertions(+), 5 deletions(-)
 
 diff --git a/net/can/bcm.c b/net/can/bcm.c
-index 71d469e..60c4a1d 100644
+index ef9eafb..7fc3421 100644
 --- a/net/can/bcm.c
 +++ b/net/can/bcm.c
 @@ -116,6 +116,7 @@ struct bcm_op {
@@ -59,7 +57,7 @@ index 71d469e..60c4a1d 100644
  	int cfsiz;
  	u32 count;
  	u32 nframes;
-@@ -792,6 +793,33 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
+@@ -791,6 +792,33 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
  			return;
  	}
  
@@ -93,7 +91,7 @@ index 71d469e..60c4a1d 100644
  	/* disable timeout */
  	hrtimer_cancel(&op->timer);
  
-@@ -826,10 +854,9 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
+@@ -825,10 +853,9 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
  			traffic_flags |= RX_OWN;
  	}
  
@@ -107,7 +105,7 @@ index 71d469e..60c4a1d 100644
  	 */
  	op->rx_stamp = skb->tstamp;
  	op->rx_ifindex = skb->dev->ifindex;
-@@ -1364,6 +1391,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1363,6 +1390,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  			op->kt_ival1 = bcm_timeval_to_ktime(msg_head->ival1);
  			op->kt_ival2 = bcm_timeval_to_ktime(msg_head->ival2);
  			op->kt_lastmsg = 0;
@@ -115,7 +113,7 @@ index 71d469e..60c4a1d 100644
  		}
  		spin_unlock_bh(&op->bcm_rx_update_lock);
  
-@@ -1766,10 +1794,21 @@ static void bcm_notify(struct bcm_sock *bo, unsigned long msg,
+@@ -1763,10 +1791,21 @@ static void bcm_notify(struct bcm_sock *bo, unsigned long msg,
  		lock_sock(sk);
  
  		/* rx_ops: remove device specific receive entries */
