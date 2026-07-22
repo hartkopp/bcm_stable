@@ -55,3 +55,15 @@ git push -u origin history/master history/linux-6.6.y history/linux-6.1.y \
 Hinweis: Das Skript legt den Ziel-Branch neu an (`--orphan`) und bricht
 ab, wenn er schon existiert — für ein erneutes Erzeugen also vorher
 `git branch -D <target-branch>` ausführen.
+
+Der Datei-Parameter ist generisch nutzbar; für die begleitenden
+`net/can/isotp.c`-Patches derselben Serie lässt sich dieselbe Historie
+parallel unter dem Namensraum `history-isotp/*` erzeugen, siehe
+`mail/STATUS.md`.
+
+## mail/
+
+Enthält die Statusmails von `stable@vger.kernel.org` (Greg Kroah-Hartman)
+zu den 11 `bcm.c`-Patches. `mail/STATUS.md` fasst daraus eine nach
+Mainline-Anwendungsreihenfolge sortierte Matrix zusammen, welcher Patch
+auf welchem stable-Branch bereits übernommen wurde bzw. fehlschlägt.
