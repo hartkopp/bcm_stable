@@ -49,13 +49,13 @@ Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
- bcm.c | 49 ++++++++++++++++++++++++++++++++++++++++++++-----
+ net/can/bcm.c | 49 ++++++++++++++++++++++++++++++++++++++++++++-----
  1 file changed, 44 insertions(+), 5 deletions(-)
 
-diff --git a/bcm.c b/bcm.c
+diff --git a/net/can/bcm.c b/net/can/bcm.c
 index f914f49..75eb171 100644
---- a/bcm.c
-+++ b/bcm.c
+--- a/net/can/bcm.c
++++ b/net/can/bcm.c
 @@ -114,6 +114,7 @@ struct bcm_op {
  	struct hrtimer timer, thrtimer;
  	ktime_t rx_stamp, kt_ival1, kt_ival2, kt_lastmsg;

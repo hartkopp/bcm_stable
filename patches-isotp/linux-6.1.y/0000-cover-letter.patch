@@ -37,7 +37,7 @@ Oliver Hartkopp (2):
   can: isotp: fix use-after-free race with concurrent NETDEV_UNREGISTER
   can: isotp: serialize TX state transitions under so->rx_lock
 
- isotp.c | 281 +++++++++++++++++++++++++++++++++++++++++++++++++----------------
+ net/can/isotp.c | 281 +++++++++++++++++++++++++++++++++++++++++++++++++----------------
  1 file changed, 214 insertions(+), 67 deletions(-)
 
 --

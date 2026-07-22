@@ -30,13 +30,13 @@ Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
- bcm.c | 104 ++++++++++++++++++++++++++++++++++++++++++----------------
+ net/can/bcm.c | 104 ++++++++++++++++++++++++++++++++++++++++++----------------
  1 file changed, 75 insertions(+), 29 deletions(-)
 
-diff --git a/bcm.c b/bcm.c
+diff --git a/net/can/bcm.c b/net/can/bcm.c
 index 762db0b..8529061 100644
---- a/bcm.c
-+++ b/bcm.c
+--- a/net/can/bcm.c
++++ b/net/can/bcm.c
 @@ -125,7 +125,7 @@ struct bcm_op {
  	struct canfd_frame last_sframe;
  	struct sock *sk;

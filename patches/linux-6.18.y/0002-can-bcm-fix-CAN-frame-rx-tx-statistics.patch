@@ -43,13 +43,13 @@ Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
- bcm.c | 69 +++++++++++++++++++++++++++++++++++++++--------------------
+ net/can/bcm.c | 69 +++++++++++++++++++++++++++++++++++++++--------------------
  1 file changed, 46 insertions(+), 23 deletions(-)
 
-diff --git a/bcm.c b/bcm.c
+diff --git a/net/can/bcm.c b/net/can/bcm.c
 index 3d151bb..24aca35 100644
---- a/bcm.c
-+++ b/bcm.c
+--- a/net/can/bcm.c
++++ b/net/can/bcm.c
 @@ -111,7 +111,7 @@ struct bcm_op {
  	int ifindex;
  	canid_t can_id;

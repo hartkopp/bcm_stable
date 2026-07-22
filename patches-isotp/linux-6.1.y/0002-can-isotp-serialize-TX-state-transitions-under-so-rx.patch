@@ -60,13 +60,13 @@ Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
- isotp.c | 192 +++++++++++++++++++++++++++++++++++++++++++++-----------
+ net/can/isotp.c | 192 +++++++++++++++++++++++++++++++++++++++++++++-----------
  1 file changed, 154 insertions(+), 38 deletions(-)
 
-diff --git a/isotp.c b/isotp.c
+diff --git a/net/can/isotp.c b/net/can/isotp.c
 index b0fa3b1..593de7b 100644
---- a/isotp.c
-+++ b/isotp.c
+--- a/net/can/isotp.c
++++ b/net/can/isotp.c
 @@ -143,7 +143,7 @@ struct isotp_sock {
  	canid_t rxid;
  	ktime_t tx_gap;

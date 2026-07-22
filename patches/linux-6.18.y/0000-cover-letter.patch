@@ -41,7 +41,7 @@ Oliver Hartkopp (8):
   can: bcm: track a single source interface for ANYDEV timeout/throttle
     ops
 
- bcm.c | 523 +++++++++++++++++++++++++++++++++++++++++++++++++-----------------
+ net/can/bcm.c | 523 +++++++++++++++++++++++++++++++++++++++++++++++++-----------------
  1 file changed, 394 insertions(+), 129 deletions(-)
 
 --

@@ -36,13 +36,13 @@ Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
- bcm.c | 13 ++++++++-----
+ net/can/bcm.c | 13 ++++++++-----
  1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/bcm.c b/bcm.c
+diff --git a/net/can/bcm.c b/net/can/bcm.c
 index acfa50e..d8a3c8a 100644
---- a/bcm.c
-+++ b/bcm.c
+--- a/net/can/bcm.c
++++ b/net/can/bcm.c
 @@ -794,11 +794,6 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
  	/* disable timeout */
  	hrtimer_cancel(&op->timer);

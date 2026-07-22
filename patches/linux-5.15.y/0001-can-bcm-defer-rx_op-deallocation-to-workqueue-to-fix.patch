@@ -61,13 +61,13 @@ Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
- bcm.c | 36 +++++++++++++++++++++++++++++++++---
+ net/can/bcm.c | 36 +++++++++++++++++++++++++++++++++---
  1 file changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/bcm.c b/bcm.c
+diff --git a/net/can/bcm.c b/net/can/bcm.c
 index 317cd4c..05ef139 100644
---- a/bcm.c
-+++ b/bcm.c
+--- a/net/can/bcm.c
++++ b/net/can/bcm.c
 @@ -58,6 +58,7 @@
  #include <linux/can/skb.h>
  #include <linux/can/bcm.h>
