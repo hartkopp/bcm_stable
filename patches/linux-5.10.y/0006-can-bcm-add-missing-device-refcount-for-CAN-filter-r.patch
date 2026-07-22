@@ -1,10 +1,8 @@
 From 5f553ff037ef792c6310b6402ee9b72effa3bdae Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
-References: <2026072013-angled-grafted-e9e4@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
-Subject: [PATCH 5.10.y 6/9] can: bcm: add missing device refcount for CAN
- filter removal
+Subject: [PATCH 6/9] can: bcm: add missing device refcount for CAN filter
+ removal
 
 commit d59948293ea34b6337ce2b5febab8510de70048c upstream.
 

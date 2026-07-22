@@ -1,10 +1,8 @@
 From 34229a64a12b4661ce26bcd8b9d1b0a92ae7b842 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
-References: <2026072013-angled-grafted-e9e4@gregkh>
 From: Lee Jones <lee@kernel.org>
 Date: Tue, 14 Jul 2026 18:55:23 +0200
-Subject: [PATCH 5.10.y 1/9] can: bcm: defer rx_op deallocation to workqueue to
- fix thrtimer UAF
+Subject: [PATCH 1/9] can: bcm: defer rx_op deallocation to workqueue to fix
+ thrtimer UAF
 
 commit 68973f9db76144825e4f35dfdc80fb8279eb2d57 upstream.
 

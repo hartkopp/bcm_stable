@@ -1,8 +1,8 @@
-From 898eaf942c8dc42acdab92c444d70874d822cf27 Mon Sep 17 00:00:00 2001
+From 3b4e3bb11500c59d7f2945bc9faf8ef8d10e5b9c Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
 References: <2026072013-angled-grafted-e9e4@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 18:37:45 +0000
+Date: Wed, 22 Jul 2026 19:03:00 +0000
 Subject: [PATCH 5.10.y 0/9] can: bcm: backport of 9 patches that failed to
  apply to 5.10-stable
 
@@ -46,11 +46,23 @@ was released). Replaced with the plain, always-available dev_hold()/
 dev_put(), which is functionally identical for the actual fix
 (holding a reference across a concurrent NETDEV_UNREGISTER) - just
 without the extra leak-tracking instrumentation. Confirmed by an
-actual build error when applying the previous version of this patch
+actual build error when applying an earlier version of this patch
 set to a real 5.10.260 tree ("error: unknown type name
 'netdevice_tracker'"); this revision has been verified with a clean
 git am against a seeded net/can/bcm.c and no longer references that
 type anywhere in the result.
+
+Patch 9/9 ("track a single source interface for ANYDEV
+timeout/throttle ops") is likewise adapted: upstream reads
+skb->dev->reg_state via READ_ONCE(), which fails to compile on
+5.10-stable ("error: 'sizeof' applied to a bit-field") because
+reg_state is declared as a bit-field member of struct net_device on
+this branch. Reads it as a plain field instead, which is
+functionally equivalent for this best-effort claim heuristic (the
+correctness of the actual fix does not depend on the compiler
+barrier READ_ONCE() would add here). Confirmed by an actual build
+error against the same real 5.10.260 tree; this revision has been
+verified with a clean git am against a seeded net/can/bcm.c.
 
 Patches 4-7 are unmodified backports that apply cleanly once 2/9 is
 in place; they were previously reported as FAILED for the same
