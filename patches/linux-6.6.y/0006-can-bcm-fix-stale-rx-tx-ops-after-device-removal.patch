@@ -1,9 +1,9 @@
-From 14a0f0f24957197c75652e1a72acc9ee9f2fda4b Mon Sep 17 00:00:00 2001
+From 00f8dbcd48b5269b49a8366d73e24460e919fc59 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
 References: <2026072011-untruth-wrongly-ed18@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:31 +0200
-Subject: [PATCH 6.6.y 5/5] can: bcm: fix stale rx/tx ops after device removal
+Subject: [PATCH 6.6.y 6/8] can: bcm: fix stale rx/tx ops after device removal
 
 commit 3b762c0d950383ab7a002686c9136b9aa55d2d70 upstream.
 
@@ -42,10 +42,10 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
  1 file changed, 44 insertions(+), 10 deletions(-)
 
 diff --git a/bcm.c b/bcm.c
-index 7648329..bde5aa2 100644
+index 9e9f9c9..21f33a5 100644
 --- a/bcm.c
 +++ b/bcm.c
-@@ -1217,6 +1217,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1240,6 +1240,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  	struct bcm_sock *bo = bcm_sk(sk);
  	struct bcm_op *op;
  	int do_rx_register;
@@ -53,7 +53,7 @@ index 7648329..bde5aa2 100644
  	int err = 0;
  
  	if ((msg_head->flags & RX_FILTER_ID) || (!(msg_head->nframes))) {
-@@ -1301,8 +1302,15 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1324,8 +1325,15 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  		/* free temporary frames / kfree(NULL) is safe */
  		kfree(new_frames);
  
@@ -71,7 +71,7 @@ index 7648329..bde5aa2 100644
  
  	} else {
  		/* insert new BCM operation for the given can_id */
-@@ -1372,6 +1380,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1395,6 +1403,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  
  		/* call can_rx_register() */
  		do_rx_register = 1;
@@ -79,7 +79,7 @@ index 7648329..bde5aa2 100644
  
  	} /* if ((op = bcm_find_op(&bo->rx_ops, msg_head->can_id, ifindex))) */
  
-@@ -1385,7 +1394,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1408,7 +1417,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  		if (op->flags & SETTIMER) {
  
  			/* set timers (locked) for newly created op */
@@ -88,7 +88,7 @@ index 7648329..bde5aa2 100644
  				spin_lock_bh(&op->bcm_rx_update_lock);
  				op->ival1 = msg_head->ival1;
  				op->ival2 = msg_head->ival2;
-@@ -1415,7 +1424,10 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1438,7 +1447,10 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  				      HRTIMER_MODE_REL_SOFT);
  	}
  
@@ -100,7 +100,7 @@ index 7648329..bde5aa2 100644
  	if (do_rx_register) {
  		if (ifindex) {
  			struct net_device *dev;
-@@ -1447,18 +1459,32 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1470,18 +1482,32 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  				err = -ENODEV;
  			}
  
@@ -138,7 +138,7 @@ index 7648329..bde5aa2 100644
  	}
  
  	return msg_head->nframes * op->cfsiz + MHSIZ;
-@@ -1674,11 +1700,19 @@ static void bcm_notify(struct bcm_sock *bo, unsigned long msg,
+@@ -1697,11 +1723,19 @@ static void bcm_notify(struct bcm_sock *bo, unsigned long msg,
  	case NETDEV_UNREGISTER:
  		lock_sock(sk);
  

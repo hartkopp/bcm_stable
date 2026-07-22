@@ -1,9 +1,9 @@
-From 61ead0ad7fb46bdb8b50b228d87056aa729cac65 Mon Sep 17 00:00:00 2001
+From 8fe3c74b23fdec4974236c6d3cff89aa468726ea Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
 References: <2026072011-untruth-wrongly-ed18@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:28 +0200
-Subject: [PATCH 6.6.y 2/5] can: bcm: extend bcm_tx_lock usage for data and
+Subject: [PATCH 6.6.y 3/8] can: bcm: extend bcm_tx_lock usage for data and
  timer updates
 
 commit 12ce799f7ab1e05bd8fbf79e46f403bfe5597ebc upstream.
@@ -34,7 +34,7 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
  1 file changed, 75 insertions(+), 29 deletions(-)
 
 diff --git a/bcm.c b/bcm.c
-index 210ce99..02e6fa6 100644
+index 762db0b..8529061 100644
 --- a/bcm.c
 +++ b/bcm.c
 @@ -125,7 +125,7 @@ struct bcm_op {
@@ -46,7 +46,7 @@ index 210ce99..02e6fa6 100644
  	spinlock_t bcm_rx_update_lock; /* protect filter/timer data updates */
  };
  
-@@ -418,12 +418,18 @@ static bool bcm_tx_set_expiry(struct bcm_op *op, struct hrtimer *hrt)
+@@ -440,12 +440,18 @@ static bool bcm_tx_set_expiry(struct bcm_op *op, struct hrtimer *hrt)
  {
  	ktime_t ival;
  
@@ -67,7 +67,7 @@ index 210ce99..02e6fa6 100644
  
  	hrtimer_set_expires(hrt, ktime_add(ktime_get(), ival));
  	return true;
-@@ -440,25 +446,47 @@ static enum hrtimer_restart bcm_tx_timeout_handler(struct hrtimer *hrtimer)
+@@ -462,25 +468,47 @@ static enum hrtimer_restart bcm_tx_timeout_handler(struct hrtimer *hrtimer)
  {
  	struct bcm_op *op = container_of(hrtimer, struct bcm_op, timer);
  	struct bcm_msg_head msg_head;
@@ -122,7 +122,7 @@ index 210ce99..02e6fa6 100644
  		bcm_can_tx(op, NULL);
  	}
  
-@@ -965,6 +993,8 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -988,6 +1016,8 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  	/* check the given can_id */
  	op = bcm_find_op(&bo->tx_ops, msg_head, ifindex);
  	if (op) {
@@ -131,7 +131,7 @@ index 210ce99..02e6fa6 100644
  		/* update existing BCM operation */
  
  		/*
-@@ -975,11 +1005,23 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -998,11 +1028,23 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  		if (msg_head->nframes > op->nframes)
  			return -E2BIG;
  
@@ -157,7 +157,7 @@ index 210ce99..02e6fa6 100644
  
  			if (op->flags & CAN_FD_FRAME) {
  				if (cf->len > 64)
-@@ -989,36 +1031,38 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1012,36 +1054,38 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  					err = -EINVAL;
  			}
  
@@ -213,7 +213,7 @@ index 210ce99..02e6fa6 100644
  
  	} else {
  		/* insert new BCM operation for the given can_id */
-@@ -1095,10 +1139,12 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1118,10 +1162,12 @@ static int bcm_tx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  
  	if (op->flags & SETTIMER) {
  		/* set timer values */

@@ -1,9 +1,9 @@
-From a0e0bc7058987ee4be103fabd1782db15d326f6b Mon Sep 17 00:00:00 2001
+From a3e2f1a3bd3ee14834b2fa2dca65582b67572f50 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
 References: <2026072011-untruth-wrongly-ed18@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
-Subject: [PATCH 6.6.y 4/5] can: bcm: add missing device refcount for CAN
+Subject: [PATCH 6.6.y 5/8] can: bcm: add missing device refcount for CAN
  filter removal
 
 commit d59948293ea34b6337ce2b5febab8510de70048c upstream.
@@ -40,7 +40,7 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
  1 file changed, 27 insertions(+), 20 deletions(-)
 
 diff --git a/bcm.c b/bcm.c
-index 0d94f43..7648329 100644
+index 01773cb..9e9f9c9 100644
 --- a/bcm.c
 +++ b/bcm.c
 @@ -125,6 +125,7 @@ struct bcm_op {
@@ -51,7 +51,7 @@ index 0d94f43..7648329 100644
  	spinlock_t bcm_tx_lock; /* protect tx data and timer updates */
  	spinlock_t bcm_rx_update_lock; /* protect filter/timer data updates */
  };
-@@ -866,6 +867,7 @@ static void bcm_rx_unreg(struct net_device *dev, struct bcm_op *op)
+@@ -889,6 +890,7 @@ static void bcm_rx_unreg(struct net_device *dev, struct bcm_op *op)
  
  		/* mark as removed subscription */
  		op->rx_reg_dev = NULL;
@@ -59,7 +59,7 @@ index 0d94f43..7648329 100644
  	} else
  		printk(KERN_ERR "can-bcm: bcm_rx_unreg: registered device "
  		       "mismatch %p %p\n", op->rx_reg_dev, dev);
-@@ -896,17 +898,14 @@ static int bcm_delete_rx_op(struct list_head *ops, struct bcm_msg_head *mh,
+@@ -919,17 +921,14 @@ static int bcm_delete_rx_op(struct list_head *ops, struct bcm_msg_head *mh,
  				 * Only remove subscriptions that had not
  				 * been removed due to NETDEV_UNREGISTER
  				 * in bcm_notifier()
@@ -84,7 +84,7 @@ index 0d94f43..7648329 100644
  			} else
  				can_rx_unregister(sock_net(op->sk), NULL,
  						  op->can_id,
-@@ -1429,7 +1428,17 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1452,7 +1451,17 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  						      bcm_rx_handler, op,
  						      "bcm", sk);
  
@@ -103,7 +103,7 @@ index 0d94f43..7648329 100644
  				dev_put(dev);
  			} else {
  				/* the requested device is gone - do not
-@@ -1802,16 +1811,14 @@ static int bcm_release(struct socket *sock)
+@@ -1825,16 +1834,14 @@ static int bcm_release(struct socket *sock)
  			 * Only remove subscriptions that had not
  			 * been removed due to NETDEV_UNREGISTER
  			 * in bcm_notifier()

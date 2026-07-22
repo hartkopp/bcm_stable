@@ -1,9 +1,9 @@
-From b260d612c93ec20d33067129c4e99127887c213d Mon Sep 17 00:00:00 2001
+From efbaec76170c3ea12e7e315ace40ad87514051b9 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
 References: <2026072011-untruth-wrongly-ed18@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:29 +0200
-Subject: [PATCH 6.6.y 3/5] can: bcm: validate frame length in bcm_rx_setup()
+Subject: [PATCH 6.6.y 4/8] can: bcm: validate frame length in bcm_rx_setup()
  for RTR replies
 
 commit 62ec41f364648be79d54d94d0d240ee326948afd upstream.
@@ -25,10 +25,10 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
  1 file changed, 41 insertions(+), 18 deletions(-)
 
 diff --git a/bcm.c b/bcm.c
-index 02e6fa6..0d94f43 100644
+index 8529061..01773cb 100644
 --- a/bcm.c
 +++ b/bcm.c
-@@ -1176,22 +1176,37 @@ free_op:
+@@ -1199,22 +1199,37 @@ free_op:
  	return err;
  }
  
@@ -74,7 +74,7 @@ index 02e6fa6..0d94f43 100644
  }
  
  /*
-@@ -1254,7 +1269,11 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1277,7 +1292,11 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  				return err;
  			}
  
@@ -87,7 +87,7 @@ index 02e6fa6..0d94f43 100644
  		}
  
  		spin_lock_bh(&op->bcm_rx_update_lock);
-@@ -1327,16 +1346,12 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1350,16 +1369,12 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  		if (msg_head->nframes) {
  			err = memcpy_from_msg(op->frames, msg,
  					      msg_head->nframes * op->cfsiz);
@@ -109,7 +109,7 @@ index 02e6fa6..0d94f43 100644
  		}
  
  		/* bcm_can_tx / bcm_tx_timeout_handler needs this */
-@@ -1438,6 +1453,14 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1461,6 +1476,14 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  	}
  
  	return msg_head->nframes * op->cfsiz + MHSIZ;
