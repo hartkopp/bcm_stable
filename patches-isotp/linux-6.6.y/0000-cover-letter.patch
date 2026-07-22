@@ -1,8 +1,8 @@
-From 0c5e1b58c58e6b771c0af4aacc7a58164a873198 Mon Sep 17 00:00:00 2001
+From 2e99ad2bb3aef537aea862e2f426f457bb0530f9 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072053-spoils-overlying-285a@gregkh>
 References: <2026072053-spoils-overlying-285a@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 14:52:41 +0000
+Date: Wed, 22 Jul 2026 18:58:00 +0000
 Subject: [PATCH 6.6.y 0/2] can: isotp: backport of 2 patches that failed to
  apply to 6.6-stable
 
@@ -18,15 +18,27 @@ process for 6.6 ("can: isotp: use unconditional synchronize_rcu()
 in isotp_release()").
 
 Unlike on 5.10.y/5.15.y/6.1.y, the dynamic max_pdu_size TX buffer
-resize feature (commits 2f2dd39/973bb01) is already present here, so
-patch 1/2 needed no adaptation at all beyond a merge artifact
-(READ_ONCE(dev->mtu) with the redundant dev_put() removed, matching
-upstream exactly). Patch 2/2 still needed one adaptation: the
-hrtimer_setup() API consolidation is not yet present on 6.6-stable,
-so the new so->echotimer is initialized with hrtimer_init()+
-.function= like the other timers in isotp_init() on this branch. The
-actual race fixes themselves are unaffected and fully applied. See
-each patch's changelog for details.
+resize feature (commits 2f2dd39/973bb01) is already present here.
+Patch 2/2 still needed one adaptation: the hrtimer_setup() API
+consolidation is not yet present on 6.6-stable, so the new
+so->echotimer is initialized with hrtimer_init()+.function= like the
+other timers in isotp_init() on this branch. The actual race fixes
+themselves are unaffected and fully applied. See each patch's
+changelog for details.
+
+Patch 1/2 ("fix use-after-free race with concurrent
+NETDEV_UNREGISTER") is additionally adapted: upstream uses the
+netdevice_tracker/netdev_hold()/netdev_put() debug-tracking infra,
+which is not available on 6.6-stable. Replaced with the plain,
+always-available dev_hold()/dev_put(), which is functionally
+identical for the actual fix (holding a reference across a
+concurrent NETDEV_UNREGISTER) - just without the extra leak-tracking
+instrumentation. This mirrors the same adaptation made to the bcm.c
+patch series and to isotp.c on 5.10.y/5.15.y/6.1.y, after an actual
+build failure was reported there ("error: unknown type name
+'netdevice_tracker'"); this revision has been verified with a clean
+git am against a seeded net/can/isotp.c and no longer references
+that type anywhere in the result.
 
 This assumes the 1 already-queued isotp.c patch for 6.6-stable has
 landed by the time this is applied. If not, please let me know and I
@@ -36,8 +48,8 @@ Oliver Hartkopp (2):
   can: isotp: fix use-after-free race with concurrent NETDEV_UNREGISTER
   can: isotp: serialize TX state transitions under so->rx_lock
 
- net/can/isotp.c | 281 +++++++++++++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 214 insertions(+), 67 deletions(-)
+ net/can/isotp.c | 280 ++++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 213 insertions(+), 67 deletions(-)
 
 --
 2.43.0
