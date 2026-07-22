@@ -57,13 +57,14 @@ ab, wenn er schon existiert — für ein erneutes Erzeugen also vorher
 `git branch -D <target-branch>` ausführen.
 
 Der Datei-Parameter ist generisch nutzbar; für die begleitenden
-`net/can/isotp.c`-Patches derselben Serie lässt sich dieselbe Historie
-parallel unter dem Namensraum `history-isotp/*` erzeugen, siehe
-`mail/STATUS.md`.
+`net/can/isotp.c`-Patches derselben Serie existiert dieselbe Historie
+parallel unter dem Namensraum `history-isotp/*`, siehe
+[mail/STATUS.md](mail/STATUS.md).
 
 ## mail/
 
 Enthält die Statusmails von `stable@vger.kernel.org` (Greg Kroah-Hartman)
-zu den 11 `bcm.c`-Patches. `mail/STATUS.md` fasst daraus eine nach
-Mainline-Anwendungsreihenfolge sortierte Matrix zusammen, welcher Patch
-auf welchem stable-Branch bereits übernommen wurde bzw. fehlschlägt.
+zu den 11 `bcm.c`- und 3 begleitenden `isotp.c`-Patches. Siehe
+[mail/STATUS.md](mail/STATUS.md) für eine nach Mainline-Anwendungsreihenfolge
+sortierte Matrix, welcher Patch auf welchem stable-Branch bereits
+übernommen wurde bzw. fehlschlägt.
