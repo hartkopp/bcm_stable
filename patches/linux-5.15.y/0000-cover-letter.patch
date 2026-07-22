@@ -1,8 +1,8 @@
-From b86889d7b4430c21a9051f362d483057c9a70fa9 Mon Sep 17 00:00:00 2001
+From b3aa6c9412e996040175e766d09d43c012c037ad Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072013-groggily-broker-cca7@gregkh>
 References: <2026072013-groggily-broker-cca7@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 18:45:41 +0000
+Date: Wed, 22 Jul 2026 19:04:00 +0000
 Subject: [PATCH 5.15.y 0/9] can: bcm: backport of 9 patches that failed to
  apply to 5.15-stable
 
@@ -49,6 +49,17 @@ reported there ("error: unknown type name 'netdevice_tracker'"); this
 revision has been verified with a clean git am against a seeded
 net/can/bcm.c and no longer references that type anywhere in the
 result.
+
+Patch 9/9 ("track a single source interface for ANYDEV
+timeout/throttle ops") is likewise adapted: upstream reads
+skb->dev->reg_state via READ_ONCE(), which fails to compile on
+5.15-stable ("error: 'sizeof' applied to a bit-field") because
+reg_state is declared as a bit-field member of struct net_device on
+this branch, same as on 5.10.y. Reads it as a plain field instead,
+functionally equivalent for this best-effort claim heuristic. This
+mirrors the same adaptation made on 5.10.y after an actual build
+failure was reported there; this revision has been verified with a
+clean git am against a seeded net/can/bcm.c.
 
 Patches 4-7 are unmodified backports that apply cleanly once 2/9 is
 in place; they were previously reported as FAILED for the same
