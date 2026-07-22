@@ -1,8 +1,8 @@
-From e5bebb9260b2591d15737cf1dbbade22188cc95a Mon Sep 17 00:00:00 2001
+From 898eaf942c8dc42acdab92c444d70874d822cf27 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
 References: <2026072013-angled-grafted-e9e4@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 12:06:10 +0000
+Date: Wed, 22 Jul 2026 18:37:45 +0000
 Subject: [PATCH 5.10.y 0/9] can: bcm: backport of 9 patches that failed to
  apply to 5.10-stable
 
@@ -38,6 +38,20 @@ contain are unaffected and fully applied. Patch 2/9 also required
 one further manual re-anchor in bcm_rx_thr_handler(), which had not
 yet gone through an unrelated refactor present on newer branches.
 
+Patch 6/9 ("add missing device refcount for CAN filter removal") is
+additionally adapted: upstream uses the netdevice_tracker/
+netdev_hold()/netdev_put() debug-tracking infra, which is not
+available on 5.10-stable (that infra landed well after this kernel
+was released). Replaced with the plain, always-available dev_hold()/
+dev_put(), which is functionally identical for the actual fix
+(holding a reference across a concurrent NETDEV_UNREGISTER) - just
+without the extra leak-tracking instrumentation. Confirmed by an
+actual build error when applying the previous version of this patch
+set to a real 5.10.260 tree ("error: unknown type name
+'netdevice_tracker'"); this revision has been verified with a clean
+git am against a seeded net/can/bcm.c and no longer references that
+type anywhere in the result.
+
 Patches 4-7 are unmodified backports that apply cleanly once 2/9 is
 in place; they were previously reported as FAILED for the same
 underlying reason (missing bcm_rx_update_lock prerequisite), not for
@@ -61,8 +75,8 @@ Oliver Hartkopp (8):
   can: bcm: track a single source interface for ANYDEV timeout/throttle
     ops
 
- net/can/bcm.c | 561 ++++++++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 428 insertions(+), 133 deletions(-)
+ net/can/bcm.c | 558 ++++++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 425 insertions(+), 133 deletions(-)
 
 --
 2.43.0

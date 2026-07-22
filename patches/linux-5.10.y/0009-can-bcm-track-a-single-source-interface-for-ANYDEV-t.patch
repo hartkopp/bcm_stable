@@ -1,4 +1,4 @@
-From e5bebb9260b2591d15737cf1dbbade22188cc95a Mon Sep 17 00:00:00 2001
+From 898eaf942c8dc42acdab92c444d70874d822cf27 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
 References: <2026072013-angled-grafted-e9e4@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
@@ -55,7 +55,7 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
  1 file changed, 44 insertions(+), 5 deletions(-)
 
 diff --git a/net/can/bcm.c b/net/can/bcm.c
-index eabd159..d665fb8 100644
+index 95eb791..8b29185 100644
 --- a/net/can/bcm.c
 +++ b/net/can/bcm.c
 @@ -114,6 +114,7 @@ struct bcm_op {
@@ -66,7 +66,7 @@ index eabd159..d665fb8 100644
  	int cfsiz;
  	u32 count;
  	u32 nframes;
-@@ -754,6 +755,33 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
+@@ -753,6 +754,33 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
  	if (skb->len != op->cfsiz)
  		return;
  
@@ -100,7 +100,7 @@ index eabd159..d665fb8 100644
  	/* disable timeout */
  	hrtimer_cancel(&op->timer);
  
-@@ -780,10 +808,9 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
+@@ -779,10 +807,9 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
  	 */
  	bcm_update_rx_stats(op);
  
@@ -114,7 +114,7 @@ index eabd159..d665fb8 100644
  	 */
  	op->rx_stamp = skb->tstamp;
  	op->rx_ifindex = skb->dev->ifindex;
-@@ -1317,6 +1344,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1316,6 +1343,7 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  			op->kt_ival1 = bcm_timeval_to_ktime(msg_head->ival1);
  			op->kt_ival2 = bcm_timeval_to_ktime(msg_head->ival2);
  			op->kt_lastmsg = 0;
@@ -122,7 +122,7 @@ index eabd159..d665fb8 100644
  		}
  		spin_unlock_bh(&op->bcm_rx_update_lock);
  
-@@ -1722,10 +1750,21 @@ static void bcm_notify(struct bcm_sock *bo, unsigned long msg,
+@@ -1719,10 +1747,21 @@ static void bcm_notify(struct bcm_sock *bo, unsigned long msg,
  		lock_sock(sk);
  
  		/* rx_ops: remove device specific receive entries */

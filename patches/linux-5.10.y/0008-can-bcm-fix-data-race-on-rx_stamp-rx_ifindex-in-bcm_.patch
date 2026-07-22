@@ -1,4 +1,4 @@
-From 141da1bf22b676b5a10ad4e36da48e428b349764 Mon Sep 17 00:00:00 2001
+From b87d61e3ea6006455d2ea9ac14e84183abc87e22 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
 References: <2026072013-angled-grafted-e9e4@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
@@ -47,10 +47,10 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
  1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/net/can/bcm.c b/net/can/bcm.c
-index e48e34b..eabd159 100644
+index c28256c..95eb791 100644
 --- a/net/can/bcm.c
 +++ b/net/can/bcm.c
-@@ -757,11 +757,6 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
+@@ -756,11 +756,6 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
  	/* disable timeout */
  	hrtimer_cancel(&op->timer);
  
@@ -62,7 +62,7 @@ index e48e34b..eabd159 100644
  	/* op->flags/op->frames may be updated concurrently by bcm_rx_setup() */
  	spin_lock_bh(&op->bcm_rx_update_lock);
  
-@@ -785,6 +780,14 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
+@@ -784,6 +779,14 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
  	 */
  	bcm_update_rx_stats(op);
  
