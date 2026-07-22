@@ -1,0 +1,52 @@
+From 0fbde2086a92f437f0441417b6bc26ca5bdb653e Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072011-atypical-tapping-9d9e@gregkh>
+References: <2026072011-atypical-tapping-9d9e@gregkh>
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+Date: Wed, 22 Jul 2026 12:49:12 +0000
+Subject: [PATCH 6.12.y 0/8] can: bcm: backport of 8 patches that failed to
+ apply to 6.12-stable
+
+This resubmits "can: bcm: add locking when updating filter and timer
+values" (commit 749179c2e25b95d22499ed29096b3e02d6dfd2b4 upstream),
+which failed to apply to the 6.12-stable tree, together with 7
+further bcm.c patches from the same upstream series that build on it
+and would otherwise fail for the same reason. This is the full set
+of 11 upstream bcm.c patches from 7.2-rc3 minus the 3 already queued
+by the normal stable process for 6.12 ("can: bcm: defer rx_op
+deallocation to workqueue to fix thrtimer UAF", "can: bcm: fix
+lockless bound/ifindex race and silent RX_SETUP failure", "can: bcm:
+add missing rcu list annotations and operations").
+
+Unlike linux-5.10.y/5.15.y/6.1.y/6.6.y, none of these 8 patches
+needed adaptation: 6.12-stable already carries commit
+fec846fa7eddf7bb651bf88bd78c7db1410ae3b1 ("can: bcm: add recvmsg
+flags for own, local and remote traffic", Jan 2024) as part of its
+own baseline (6.12 was cut well after that commit landed), so the
+traffic_flags/RX_LOCAL/RX_OWN context that made several of these
+patches conflict on older branches is already present here. All 8
+patches are therefore unmodified cherry-picks, verified to apply
+cleanly once the 3 already-queued patches are in place; they were
+previously reported as FAILED for that missing-prerequisite reason
+alone, not for independent conflicts.
+
+This assumes the 3 already-queued bcm.c patches for 6.12-stable have
+landed by the time this is applied. If not, please let me know and I
+will rebase.
+
+Oliver Hartkopp (8):
+  can: bcm: add locking when updating filter and timer values
+  can: bcm: fix CAN frame rx/tx statistics
+  can: bcm: extend bcm_tx_lock usage for data and timer updates
+  can: bcm: validate frame length in bcm_rx_setup() for RTR replies
+  can: bcm: add missing device refcount for CAN filter removal
+  can: bcm: fix stale rx/tx ops after device removal
+  can: bcm: fix data race on rx_stamp/rx_ifindex in bcm_rx_handler()
+  can: bcm: track a single source interface for ANYDEV timeout/throttle
+    ops
+
+ bcm.c | 523 +++++++++++++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 394 insertions(+), 129 deletions(-)
+
+--
+2.43.0
+
