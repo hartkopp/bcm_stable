@@ -1,0 +1,51 @@
+From 7a64e43be8cbf7d8a91f946186d2d5397f614579 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
+References: <2026072011-untruth-wrongly-ed18@gregkh>
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+Date: Wed, 22 Jul 2026 10:38:33 +0000
+Subject: [PATCH 6.6.y 0/5] can: bcm: backport of 5 patches that failed to
+ apply to 6.6-stable
+
+This resubmits "can: bcm: add locking when updating filter and timer
+values" (commit 749179c2e25b95d22499ed29096b3e02d6dfd2b4 upstream),
+which failed to apply to the 6.6-stable tree, together with 4 further
+bcm.c patches from the same upstream series that depend on it and
+would otherwise fail for the same reason.
+
+Patch 1/5 differs from the upstream commit: upstream additionally
+moves the pre-existing traffic_flags/RX_LOCAL/RX_OWN computation in
+bcm_rx_handler() under the new bcm_rx_update_lock. That code was
+introduced by commit fec846fa7eddf7bb651bf88bd78c7db1410ae3b1 ("can:
+bcm: add recvmsg flags for own, local and remote traffic"), which is
+not present on 6.6-stable and not itself a stable candidate (pure
+feature addition, no Cc: stable). That hunk is omitted; the actual
+KCSAN-reported race (bcm_rx_setup() timer/filter updates and the
+RTR-frame snapshot in bcm_rx_handler()) is unaffected and fully
+addressed by the remaining locking. See the patch changelog for
+details.
+
+Patches 2-5 are unmodified backports that apply cleanly once 1/5 is
+in place; they were previously reported as FAILED for the same
+underlying reason (missing bcm_rx_update_lock prerequisite), not for
+independent conflicts.
+
+This assumes the 3 already-queued bcm.c patches for 6.6-stable
+("can: bcm: defer rx_op deallocation to workqueue to fix thrtimer
+UAF", "can: bcm: fix lockless bound/ifindex race and silent RX_SETUP
+failure", "can: bcm: add missing rcu list annotations and
+operations") have landed by the time this is applied. If not, please
+let me know and I will rebase.
+
+Oliver Hartkopp (5):
+  can: bcm: add locking when updating filter and timer values
+  can: bcm: extend bcm_tx_lock usage for data and timer updates
+  can: bcm: validate frame length in bcm_rx_setup() for RTR replies
+  can: bcm: add missing device refcount for CAN filter removal
+  can: bcm: fix stale rx/tx ops after device removal
+
+ bcm.c | 418 +++++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 309 insertions(+), 109 deletions(-)
+
+--
+2.43.0
+
