@@ -1,9 +1,7 @@
-From 3f45cc9cd5b271d543c891bb48932812318f6b97 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072011-atypical-tapping-9d9e@gregkh>
-References: <2026072011-atypical-tapping-9d9e@gregkh>
+From 4f7a2e21071a11a4e185892f08b938885b565b74 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:26 +0200
-Subject: [PATCH 6.12.y 2/8] can: bcm: fix CAN frame rx/tx statistics
+Subject: [PATCH 2/8] can: bcm: fix CAN frame rx/tx statistics
 
 commit e6c24ba95fc3f1b5e1dcd28b1c6e59ef61a9daa5 upstream.
 

@@ -1,10 +1,8 @@
-From b108b92d9c8adf6d81e48a2144e0e504486b59f7 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072011-atypical-tapping-9d9e@gregkh>
-References: <2026072011-atypical-tapping-9d9e@gregkh>
-From: Claude <noreply@anthropic.com>
+From 970ce507fa4d4f099b027614a2e6a33c465d4d75 Mon Sep 17 00:00:00 2001
+From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Wed, 22 Jul 2026 12:47:55 +0000
-Subject: [PATCH 6.12.y 1/8] can: bcm: add locking when updating filter and
- timer values
+Subject: [PATCH 1/8] can: bcm: add locking when updating filter and timer
+ values
 
 commit 749179c2e25b95d22499ed29096b3e02d6dfd2b4 upstream.
 

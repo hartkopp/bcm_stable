@@ -1,10 +1,8 @@
-From 3b40271e97b25e5175d490d66875455984ea970d Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072011-atypical-tapping-9d9e@gregkh>
-References: <2026072011-atypical-tapping-9d9e@gregkh>
+From 6437560ad05ee66cc92bb5f3190eafce42bf7143 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:28 +0200
-Subject: [PATCH 6.12.y 3/8] can: bcm: extend bcm_tx_lock usage for data and
- timer updates
+Subject: [PATCH 3/8] can: bcm: extend bcm_tx_lock usage for data and timer
+ updates
 
 commit 12ce799f7ab1e05bd8fbf79e46f403bfe5597ebc upstream.
 

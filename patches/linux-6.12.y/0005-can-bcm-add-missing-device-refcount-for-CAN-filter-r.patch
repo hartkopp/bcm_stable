@@ -1,10 +1,8 @@
-From 075ca08cdb761fcd4ff6f71bb9c6108a1a0dee8d Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072011-atypical-tapping-9d9e@gregkh>
-References: <2026072011-atypical-tapping-9d9e@gregkh>
+From 183fca7f796750736c1e2d92b1dbf40466c00237 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
-Subject: [PATCH 6.12.y 5/8] can: bcm: add missing device refcount for CAN
- filter removal
+Subject: [PATCH 5/8] can: bcm: add missing device refcount for CAN filter
+ removal
 
 commit d59948293ea34b6337ce2b5febab8510de70048c upstream.
 
@@ -34,32 +32,32 @@ Link: https://patch.msgid.link/20260714-bcm_fixes-v15-8-562f7e3e42da@hartkopp.ne
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
+[ netdevice_tracker/netdev_hold()/netdev_put() are not available on
+  this branch. Use the plain, always-available dev_hold()/dev_put()
+  instead - functionally identical for this fix's actual purpose
+  (holding a reference across a concurrent NETDEV_UNREGISTER), just
+  without the extra leak-tracking instrumentation. The
+  rx_reg_dev_tracker struct member is dropped accordingly, since
+  dev_hold()/dev_put() need no tracker object. ]
+
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
- net/can/bcm.c | 47 +++++++++++++++++++++++++++--------------------
- 1 file changed, 27 insertions(+), 20 deletions(-)
+ net/can/bcm.c | 44 ++++++++++++++++++++++++--------------------
+ 1 file changed, 24 insertions(+), 20 deletions(-)
 
 diff --git a/net/can/bcm.c b/net/can/bcm.c
-index 80fa80d..9e71d3a 100644
+index 80fa80d..819c7cf 100644
 --- a/net/can/bcm.c
 +++ b/net/can/bcm.c
-@@ -127,6 +127,7 @@ struct bcm_op {
- 	struct canfd_frame last_sframe;
- 	struct sock *sk;
- 	struct net_device *rx_reg_dev;
-+	netdevice_tracker rx_reg_dev_tracker;
- 	spinlock_t bcm_tx_lock; /* protect tx data and timer updates */
- 	spinlock_t bcm_rx_update_lock; /* protect filter/timer data updates */
- };
-@@ -931,6 +932,7 @@ static void bcm_rx_unreg(struct net_device *dev, struct bcm_op *op)
+@@ -931,6 +931,7 @@ static void bcm_rx_unreg(struct net_device *dev, struct bcm_op *op)
  
  		/* mark as removed subscription */
  		op->rx_reg_dev = NULL;
-+		netdev_put(dev, &op->rx_reg_dev_tracker);
++		dev_put(dev);
  	} else
  		printk(KERN_ERR "can-bcm: bcm_rx_unreg: registered device "
  		       "mismatch %p %p\n", op->rx_reg_dev, dev);
-@@ -961,17 +963,14 @@ static int bcm_delete_rx_op(struct list_head *ops, struct bcm_msg_head *mh,
+@@ -961,17 +962,14 @@ static int bcm_delete_rx_op(struct list_head *ops, struct bcm_msg_head *mh,
  				 * Only remove subscriptions that had not
  				 * been removed due to NETDEV_UNREGISTER
  				 * in bcm_notifier()
@@ -84,26 +82,24 @@ index 80fa80d..9e71d3a 100644
  			} else
  				can_rx_unregister(sock_net(op->sk), NULL,
  						  op->can_id,
-@@ -1494,7 +1493,17 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
+@@ -1494,7 +1492,15 @@ static int bcm_rx_setup(struct bcm_msg_head *msg_head, struct msghdr *msg,
  						      bcm_rx_handler, op,
  						      "bcm", sk);
  
 -				op->rx_reg_dev = dev;
-+				/* keep a tracked reference so that a later
++				/* keep a reference so that a later
 +				 * unregister can safely reach the device even
 +				 * if a concurrent NETDEV_UNREGISTER has
 +				 * already unlisted it by ifindex
 +				 */
 +				if (!err) {
 +					op->rx_reg_dev = dev;
-+					netdev_hold(dev,
-+						    &op->rx_reg_dev_tracker,
-+						    GFP_KERNEL);
++					dev_hold(dev);
 +				}
  				dev_put(dev);
  			} else {
  				/* the requested device is gone - do not
-@@ -1867,16 +1876,14 @@ static int bcm_release(struct socket *sock)
+@@ -1867,16 +1873,14 @@ static int bcm_release(struct socket *sock)
  			 * Only remove subscriptions that had not
  			 * been removed due to NETDEV_UNREGISTER
  			 * in bcm_notifier()

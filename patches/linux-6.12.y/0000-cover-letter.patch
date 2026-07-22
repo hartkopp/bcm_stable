@@ -1,8 +1,8 @@
-From 0fbde2086a92f437f0441417b6bc26ca5bdb653e Mon Sep 17 00:00:00 2001
+From 19d071e844e79e38f6f2bbf73fa4ed8ab3494029 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-atypical-tapping-9d9e@gregkh>
 References: <2026072011-atypical-tapping-9d9e@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 12:49:12 +0000
+Date: Wed, 22 Jul 2026 18:53:00 +0000
 Subject: [PATCH 6.12.y 0/8] can: bcm: backport of 8 patches that failed to
  apply to 6.12-stable
 
@@ -18,16 +18,29 @@ lockless bound/ifindex race and silent RX_SETUP failure", "can: bcm:
 add missing rcu list annotations and operations").
 
 Unlike linux-5.10.y/5.15.y/6.1.y/6.6.y, none of these 8 patches
-needed adaptation: 6.12-stable already carries commit
+needed content adaptation for the traffic_flags/RX_LOCAL/RX_OWN
+context: 6.12-stable already carries commit
 fec846fa7eddf7bb651bf88bd78c7db1410ae3b1 ("can: bcm: add recvmsg
 flags for own, local and remote traffic", Jan 2024) as part of its
 own baseline (6.12 was cut well after that commit landed), so the
-traffic_flags/RX_LOCAL/RX_OWN context that made several of these
-patches conflict on older branches is already present here. All 8
-patches are therefore unmodified cherry-picks, verified to apply
-cleanly once the 3 already-queued patches are in place; they were
-previously reported as FAILED for that missing-prerequisite reason
-alone, not for independent conflicts.
+traffic_flags context that made several of these patches conflict on
+older branches is already present here. All 8 patches apply cleanly
+once the 3 already-queued patches are in place; they were previously
+reported as FAILED for that missing-prerequisite reason alone, not
+for independent conflicts.
+
+Patch 5/8 ("add missing device refcount for CAN filter removal") is
+the one exception: upstream uses the netdevice_tracker/netdev_hold()/
+netdev_put() debug-tracking infra, which is not available on
+6.12-stable. Replaced with the plain, always-available dev_hold()/
+dev_put(), which is functionally identical for the actual fix
+(holding a reference across a concurrent NETDEV_UNREGISTER) - just
+without the extra leak-tracking instrumentation. This mirrors the
+same adaptation on 5.10.y, made after an actual build failure was
+reported there ("error: unknown type name 'netdevice_tracker'"); this
+revision has been verified with a clean git am against a seeded
+net/can/bcm.c and no longer references that type anywhere in the
+result.
 
 This assumes the 3 already-queued bcm.c patches for 6.12-stable have
 landed by the time this is applied. If not, please let me know and I
@@ -44,8 +57,8 @@ Oliver Hartkopp (8):
   can: bcm: track a single source interface for ANYDEV timeout/throttle
     ops
 
- net/can/bcm.c | 523 +++++++++++++++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 394 insertions(+), 129 deletions(-)
+ net/can/bcm.c | 520 +++++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 391 insertions(+), 129 deletions(-)
 
 --
 2.43.0
