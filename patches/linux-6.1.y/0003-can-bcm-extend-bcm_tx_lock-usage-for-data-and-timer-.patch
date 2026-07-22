@@ -1,10 +1,8 @@
 From 26de2ad0552d22b32039d6971f748bb0cdd18f4e Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072012-repair-flip-109e@gregkh>
-References: <2026072012-repair-flip-109e@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:28 +0200
-Subject: [PATCH 6.1.y 3/8] can: bcm: extend bcm_tx_lock usage for data and
- timer updates
+Subject: [PATCH 3/8] can: bcm: extend bcm_tx_lock usage for data and timer
+ updates
 
 commit 12ce799f7ab1e05bd8fbf79e46f403bfe5597ebc upstream.
 
