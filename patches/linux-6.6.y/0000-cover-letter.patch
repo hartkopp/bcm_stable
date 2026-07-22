@@ -1,8 +1,8 @@
-From c49d112fe5c0d2d80d9c20bd8bdc368d3df27d32 Mon Sep 17 00:00:00 2001
+From 53faec533810692dfacb7b59776a37d97b2a2098 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
 References: <2026072011-untruth-wrongly-ed18@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 11:21:46 +0000
+Date: Wed, 22 Jul 2026 18:52:00 +0000
 Subject: [PATCH 6.6.y 0/8] can: bcm: backport of 8 patches that failed to
  apply to 6.6-stable
 
@@ -24,6 +24,19 @@ bcm_rx_update_lock and its widening scope across the series, the
 rx/tx statistics race, and the rx_stamp/rx_ifindex race) are
 unaffected and fully applied. See each patch's changelog for the
 exact adaptation.
+
+Patch 5/8 ("add missing device refcount for CAN filter removal") is
+additionally adapted: upstream uses the netdevice_tracker/
+netdev_hold()/netdev_put() debug-tracking infra, which is not
+available on 6.6-stable. Replaced with the plain, always-available
+dev_hold()/dev_put(), which is functionally identical for the actual
+fix (holding a reference across a concurrent NETDEV_UNREGISTER) -
+just without the extra leak-tracking instrumentation. This mirrors
+the same adaptation on 5.10.y, made after an actual build failure was
+reported there ("error: unknown type name 'netdevice_tracker'"); this
+revision has been verified with a clean git am against a seeded
+net/can/bcm.c and no longer references that type anywhere in the
+result.
 
 Patches 3-6 are unmodified backports that apply cleanly once 1/8 is
 in place; they were previously reported as FAILED for the same
@@ -48,8 +61,8 @@ Oliver Hartkopp (8):
   can: bcm: track a single source interface for ANYDEV timeout/throttle
     ops
 
- net/can/bcm.c | 523 +++++++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 394 insertions(+), 129 deletions(-)
+ net/can/bcm.c | 520 +++++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 391 insertions(+), 129 deletions(-)
 
 --
 2.43.0
