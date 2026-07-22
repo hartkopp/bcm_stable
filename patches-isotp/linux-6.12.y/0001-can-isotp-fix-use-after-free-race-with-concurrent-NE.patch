@@ -1,10 +1,8 @@
-From 0fe2fc9eb02a76834cd243da25c89f6ec6bffe9c Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072053-chubby-luridness-4ba8@gregkh>
-References: <2026072053-chubby-luridness-4ba8@gregkh>
+From b22bc4c35dd56adff85c463b43c573a9146822cb Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:42 +0200
-Subject: [PATCH 6.12.y 1/2] can: isotp: fix use-after-free race with
- concurrent NETDEV_UNREGISTER
+Subject: [PATCH 1/2] can: isotp: fix use-after-free race with concurrent
+ NETDEV_UNREGISTER
 
 commit 20bab8b88baac140ca3701116e1d486c7f51e311 upstream.
 
@@ -41,25 +39,32 @@ Link: https://patch.msgid.link/20260712-isotp-fixes-v10-2-793a1b1ce17f@hartkopp.
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
+[ netdevice_tracker/netdev_hold()/netdev_put() are not available on
+  this branch. Use the plain, always-available dev_hold()/dev_put()
+  instead - functionally identical for this fix's actual purpose
+  (holding a reference across a concurrent NETDEV_UNREGISTER), just
+  without the extra leak-tracking instrumentation. The dev_tracker
+  struct member is dropped accordingly, since dev_hold()/dev_put()
+  need no tracker object. ]
+
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
- net/can/isotp.c | 89 ++++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 60 insertions(+), 29 deletions(-)
+ net/can/isotp.c | 88 ++++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 59 insertions(+), 29 deletions(-)
 
 diff --git a/net/can/isotp.c b/net/can/isotp.c
-index 176e16b..0493670 100644
+index 176e16b..76e84e2 100644
 --- a/net/can/isotp.c
 +++ b/net/can/isotp.c
-@@ -151,6 +151,8 @@ struct isotp_sock {
+@@ -151,6 +151,7 @@ struct isotp_sock {
  	struct sock sk;
  	int bound;
  	int ifindex;
 +	struct net_device *dev;
-+	netdevice_tracker dev_tracker;
  	canid_t txid;
  	canid_t rxid;
  	ktime_t tx_gap;
-@@ -964,6 +966,14 @@ static int isotp_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+@@ -964,6 +965,14 @@ static int isotp_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
  			goto err_event_drop;
  	}
  
@@ -74,7 +79,7 @@ index 176e16b..0493670 100644
  	/* PDU size > default => try max_pdu_size */
  	if (size > so->tx.buflen && so->tx.buflen < max_pdu_size) {
  		u8 *newbuf = kmalloc(max_pdu_size, GFP_KERNEL);
-@@ -1199,28 +1209,30 @@ static int isotp_release(struct socket *sock)
+@@ -1199,28 +1208,30 @@ static int isotp_release(struct socket *sock)
  	list_del(&so->notifier);
  	spin_unlock(&isotp_notifier_lock);
  
@@ -111,7 +116,7 @@ index 176e16b..0493670 100644
 +		can_rx_unregister(net, so->dev, so->txid,
 +				  SINGLE_MASK(so->txid),
 +				  isotp_rcv_echo, sk);
-+		netdev_put(so->dev, &so->dev_tracker);
++		dev_put(so->dev);
  	}
  
 +	so->ifindex = 0;
@@ -123,7 +128,7 @@ index 176e16b..0493670 100644
  	/* Always wait for a grace period before touching the timers below.
  	 * A concurrent NETDEV_UNREGISTER may have already unregistered our
  	 * filters and cleared so->bound in isotp_notify() without waiting
-@@ -1233,9 +1245,6 @@ static int isotp_release(struct socket *sock)
+@@ -1233,9 +1244,6 @@ static int isotp_release(struct socket *sock)
  	hrtimer_cancel(&so->txtimer);
  	hrtimer_cancel(&so->rxtimer);
  
@@ -133,7 +138,7 @@ index 176e16b..0493670 100644
  	sock_orphan(sk);
  	sock->sk = NULL;
  
-@@ -1289,6 +1298,7 @@ static int isotp_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+@@ -1289,6 +1297,7 @@ static int isotp_bind(struct socket *sock, struct sockaddr *uaddr, int len)
  	if (!addr->can_ifindex)
  		return -ENODEV;
  
@@ -141,7 +146,7 @@ index 176e16b..0493670 100644
  	lock_sock(sk);
  
  	if (so->bound) {
-@@ -1296,6 +1306,17 @@ static int isotp_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+@@ -1296,6 +1305,17 @@ static int isotp_bind(struct socket *sock, struct sockaddr *uaddr, int len)
  		goto out;
  	}
  
@@ -159,7 +164,7 @@ index 176e16b..0493670 100644
  	/* ensure different CAN IDs when the rx_id is to be registered */
  	if (isotp_register_rxid(so) && rx_id == tx_id) {
  		err = -EADDRNOTAVAIL;
-@@ -1308,14 +1329,12 @@ static int isotp_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+@@ -1308,14 +1328,12 @@ static int isotp_bind(struct socket *sock, struct sockaddr *uaddr, int len)
  		goto out;
  	}
  	if (dev->type != ARPHRD_CAN) {
@@ -177,7 +182,7 @@ index 176e16b..0493670 100644
  	}
  	if (!(dev->flags & IFF_UP))
  		notify_enetdown = 1;
-@@ -1333,16 +1352,25 @@ static int isotp_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+@@ -1333,16 +1351,25 @@ static int isotp_bind(struct socket *sock, struct sockaddr *uaddr, int len)
  	can_rx_register(net, dev, tx_id, SINGLE_MASK(tx_id),
  			isotp_rcv_echo, sk, "isotpe", sk);
  
@@ -194,7 +199,7 @@ index 176e16b..0493670 100644
 +	 * NETDEV_UNREGISTER has already unlisted it by ifindex.
 +	 */
 +	so->dev = dev;
-+	netdev_hold(so->dev, &so->dev_tracker, GFP_KERNEL);
++	dev_hold(so->dev);
 +
 +out_put_dev:
 +	/* remove potential reference from dev_get_by_index() */
@@ -205,7 +210,7 @@ index 176e16b..0493670 100644
  
  	if (notify_enetdown) {
  		sk->sk_err = ENETDOWN;
-@@ -1545,7 +1573,7 @@ static void isotp_notify(struct isotp_sock *so, unsigned long msg,
+@@ -1545,7 +1572,7 @@ static void isotp_notify(struct isotp_sock *so, unsigned long msg,
  	if (!net_eq(dev_net(dev), sock_net(sk)))
  		return;
  
@@ -214,11 +219,11 @@ index 176e16b..0493670 100644
  		return;
  
  	switch (msg) {
-@@ -1561,10 +1589,12 @@ static void isotp_notify(struct isotp_sock *so, unsigned long msg,
+@@ -1561,10 +1588,12 @@ static void isotp_notify(struct isotp_sock *so, unsigned long msg,
  			can_rx_unregister(dev_net(dev), dev, so->txid,
  					  SINGLE_MASK(so->txid),
  					  isotp_rcv_echo, sk);
-+			netdev_put(so->dev, &so->dev_tracker);
++			dev_put(so->dev);
  		}
  
  		so->ifindex = 0;
@@ -227,7 +232,7 @@ index 176e16b..0493670 100644
  		release_sock(sk);
  
  		sk->sk_err = ENODEV;
-@@ -1624,6 +1654,7 @@ static int isotp_init(struct sock *sk)
+@@ -1624,6 +1653,7 @@ static int isotp_init(struct sock *sk)
  
  	so->ifindex = 0;
  	so->bound = 0;
