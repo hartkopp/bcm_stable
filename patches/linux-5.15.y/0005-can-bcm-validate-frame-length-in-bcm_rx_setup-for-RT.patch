@@ -1,10 +1,8 @@
 From b0a6cb49dab7c861feb6f237849b888b24f02fbe Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072013-groggily-broker-cca7@gregkh>
-References: <2026072013-groggily-broker-cca7@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:29 +0200
-Subject: [PATCH 5.15.y 5/9] can: bcm: validate frame length in bcm_rx_setup()
- for RTR replies
+Subject: [PATCH 5/9] can: bcm: validate frame length in bcm_rx_setup() for RTR
+ replies
 
 commit 62ec41f364648be79d54d94d0d240ee326948afd upstream.
 

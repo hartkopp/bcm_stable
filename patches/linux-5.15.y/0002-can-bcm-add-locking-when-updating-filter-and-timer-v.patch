@@ -1,10 +1,8 @@
 From 4d8795ea817567f11f239ae5353897f0bca3c1c4 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072013-groggily-broker-cca7@gregkh>
-References: <2026072013-groggily-broker-cca7@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:25 +0200
-Subject: [PATCH 5.15.y 2/9] can: bcm: add locking when updating filter and
- timer values
+Subject: [PATCH 2/9] can: bcm: add locking when updating filter and timer
+ values
 
 commit 749179c2e25b95d22499ed29096b3e02d6dfd2b4 upstream.
 

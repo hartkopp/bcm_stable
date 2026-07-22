@@ -1,9 +1,7 @@
-From cf55f95e1fe218cc6e9f3d08314bd964a694399d Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072013-groggily-broker-cca7@gregkh>
-References: <2026072013-groggily-broker-cca7@gregkh>
+From 74f3fab40f24ea5899a66a579c8b313deca68975 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:32 +0200
-Subject: [PATCH 5.15.y 8/9] can: bcm: fix data race on rx_stamp/rx_ifindex in
+Subject: [PATCH 8/9] can: bcm: fix data race on rx_stamp/rx_ifindex in
  bcm_rx_handler()
 
 commit 58fd6cbc8541216af1d7ed272ea7ac2b66d50fd8 upstream.
@@ -47,10 +45,10 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
  1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/net/can/bcm.c b/net/can/bcm.c
-index b7207bf..e50806e 100644
+index 4afc2ed..0db9c48 100644
 --- a/net/can/bcm.c
 +++ b/net/can/bcm.c
-@@ -757,11 +757,6 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
+@@ -756,11 +756,6 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
  	/* disable timeout */
  	hrtimer_cancel(&op->timer);
  
@@ -62,7 +60,7 @@ index b7207bf..e50806e 100644
  	/* op->flags/op->frames may be updated concurrently by bcm_rx_setup() */
  	spin_lock_bh(&op->bcm_rx_update_lock);
  
-@@ -785,6 +780,14 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
+@@ -784,6 +779,14 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
  	 */
  	bcm_update_rx_stats(op);
  
