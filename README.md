@@ -68,3 +68,15 @@ zu den 11 `bcm.c`- und 3 begleitenden `isotp.c`-Patches. Siehe
 [mail/STATUS.md](mail/STATUS.md) für eine nach Mainline-Anwendungsreihenfolge
 sortierte Matrix, welcher Patch auf welchem stable-Branch bereits
 übernommen wurde bzw. fehlschlägt.
+
+## backport/\* und patches/\*
+
+Für Branches, auf denen Patches wirklich manuell angepasst werden
+müssen, gibt es zusätzlich zu `history/<branch>` (reine
+Upstream-Extraktion, unverändert) einen `backport/<branch>`-Branch mit
+den handangepassten Commits (Basis: `history/<branch>` + bereits
+gequeute Vorbedingungen). Aus diesem wird mit `git format-patch` ein
+versandfertiges Patch-Set nach `patches/<branch>/` exportiert
+(0000-cover-letter + 0001…, `In-Reply-To`/`References` auf die
+jeweilige FAILED-Mail gesetzt). Siehe `patches/<branch>/README.md` für
+die Schritte vor dem tatsächlichen `git send-email`.
