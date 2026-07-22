@@ -49,6 +49,29 @@ in diesem Repo, jeweils über den `Original-commit:`-Trailer aufgelöst).
   Voraussetzungs-Commits hinterlegt; die Abhängigkeiten müssen inhaltlich
   hergeleitet werden.
 
+## Backport-Status (patches/\* und patches-isotp/\*)
+
+| Branch | bcm.c-Patches im Set | isotp.c-Patches im Set |
+|---|---|---|
+| linux-5.10.y | 9 (#4, #6, #7, #9–#14) | 2 (#2, #3) |
+| linux-5.15.y | 9 (#4, #6, #7, #9–#14) | 2 (#2, #3) |
+| linux-6.1.y | 8 (#6, #7, #9–#14) | 2 (#2, #3) |
+| linux-6.6.y | 8 (#6, #7, #9–#14) | 2 (#2, #3) |
+| linux-6.12.y | 8 (#6, #7, #9–#14, unverändert) | 2 (#2, #3, #2 unverändert) |
+| linux-6.18.y | 8 (#6, #7, #9–#14, unverändert) | **0** |
+
+`linux-6.18.y` ist bei `isotp.c` ein Sonderfall: dort sind **alle drei**
+Patches (#1, #2, #3) bereits selbst als "added" (nicht "FAILED") gemeldet,
+also schon reine gequeued über den normalen Stable-Prozess gelandet — es
+gibt keinen FAILED-Thread, auf den man antworten könnte, und nichts
+nachzureichen. `backport-isotp/linux-6.18.y` existiert trotzdem als reiner
+Verifikationsbeleg (alle 3 Patches wenden sauber an, deckungsgleich mit
+`history-isotp/master`), aber es gibt kein `patches-isotp/linux-6.18.y`.
+
+Bei `bcm.c` gilt dieselbe Konstellation nicht — dort scheitern #6, #7,
+#9–#14 auf allen sechs Branches bis einschließlich 6.18 und erst ab 7.1
+läuft alles durch, siehe Tabelle oben.
+
 ## isotp.c-Historie
 
 Analog zu `history/*` (bcm.c) existieren `history-isotp/*`-Branches
