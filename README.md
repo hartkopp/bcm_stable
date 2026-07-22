@@ -80,3 +80,7 @@ versandfertiges Patch-Set nach `patches/<branch>/` exportiert
 (0000-cover-letter + 0001…, `In-Reply-To`/`References` auf die
 jeweilige FAILED-Mail gesetzt). Siehe `patches/<branch>/README.md` für
 die Schritte vor dem tatsächlichen `git send-email`.
+
+Für `net/can/isotp.c` gilt dasselbe Schema parallel unter den
+Namensräumen `backport-isotp/<branch>` und `patches-isotp/<branch>`
+(Basis jeweils `history-isotp/<branch>`).
