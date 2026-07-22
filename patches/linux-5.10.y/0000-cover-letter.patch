@@ -1,0 +1,69 @@
+From e5bebb9260b2591d15737cf1dbbade22188cc95a Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
+References: <2026072013-angled-grafted-e9e4@gregkh>
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+Date: Wed, 22 Jul 2026 12:06:10 +0000
+Subject: [PATCH 5.10.y 0/9] can: bcm: backport of 9 patches that failed to
+ apply to 5.10-stable
+
+This resubmits "can: bcm: add locking when updating filter and timer
+values" (commit 749179c2e25b95d22499ed29096b3e02d6dfd2b4 upstream),
+which failed to apply to the 5.10-stable tree, together with 8
+further bcm.c patches from the same upstream series that build on it
+and would otherwise fail for the same reason. This is the full set
+of 11 upstream bcm.c patches from 7.2-rc3 minus the 2 already queued
+by the normal stable process for 5.10 ("can: bcm: fix lockless
+bound/ifindex race and silent RX_SETUP failure", "can: bcm: add
+missing rcu list annotations and operations").
+
+Note that patch 1/9 ("defer rx_op deallocation to workqueue") is
+also adapted here, unlike on newer branches (6.1.y and later) where
+it applies unmodified: 5.10-stable never received the unrelated
+commit edd1a7e42f1d2 ("can: bcm: registration process optimization
+in bcm_module_init()", no Cc: stable), which reworked
+bcm_module_init()/bcm_module_exit() into a goto-based, error-checked
+unwind chain. This patch's workqueue-cleanup addition is applied
+directly to the older, unrefactored module_init/module_exit
+structure instead; see the patch changelog for details.
+
+Patches 2, 3, 8 and 9 differ from their upstream commits the same
+way as on 6.6.y: upstream additionally threads a traffic_flags/
+RX_LOCAL/RX_OWN computation through bcm_rx_handler(), introduced by
+commit fec846fa7eddf7bb651bf88bd78c7db1410ae3b1 ("can: bcm: add
+recvmsg flags for own, local and remote traffic"), which is not
+present on 5.10-stable and not itself a stable candidate (pure
+feature addition, no Cc: stable). The traffic_flags-related hunks
+are omitted in each of these four patches; the actual fixes they
+contain are unaffected and fully applied. Patch 2/9 also required
+one further manual re-anchor in bcm_rx_thr_handler(), which had not
+yet gone through an unrelated refactor present on newer branches.
+
+Patches 4-7 are unmodified backports that apply cleanly once 2/9 is
+in place; they were previously reported as FAILED for the same
+underlying reason (missing bcm_rx_update_lock prerequisite), not for
+independent conflicts.
+
+This assumes the 2 already-queued bcm.c patches for 5.10-stable have
+landed by the time this is applied. If not, please let me know and I
+will rebase.
+
+Lee Jones (1):
+  can: bcm: defer rx_op deallocation to workqueue to fix thrtimer UAF
+
+Oliver Hartkopp (8):
+  can: bcm: add locking when updating filter and timer values
+  can: bcm: fix CAN frame rx/tx statistics
+  can: bcm: extend bcm_tx_lock usage for data and timer updates
+  can: bcm: validate frame length in bcm_rx_setup() for RTR replies
+  can: bcm: add missing device refcount for CAN filter removal
+  can: bcm: fix stale rx/tx ops after device removal
+  can: bcm: fix data race on rx_stamp/rx_ifindex in bcm_rx_handler()
+  can: bcm: track a single source interface for ANYDEV timeout/throttle
+    ops
+
+ bcm.c | 561 ++++++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 428 insertions(+), 133 deletions(-)
+
+--
+2.43.0
+
