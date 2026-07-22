@@ -1,10 +1,12 @@
-From e6e8a4151ecca9ae859f2c315b895534b26a2cb2 Mon Sep 17 00:00:00 2001
+From a0e0bc7058987ee4be103fabd1782db15d326f6b Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
 References: <2026072011-untruth-wrongly-ed18@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
 Subject: [PATCH 6.6.y 4/5] can: bcm: add missing device refcount for CAN
  filter removal
+
+commit d59948293ea34b6337ce2b5febab8510de70048c upstream.
 
 sashiko-bot remarked a problem with a concurrent device unregistration
 in isotp.c which also is present in the bcm.c code. A former fix for raw.c
@@ -32,8 +34,7 @@ Link: https://patch.msgid.link/20260714-bcm_fixes-v15-8-562f7e3e42da@hartkopp.ne
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-Original-commit: d59948293ea34b6337ce2b5febab8510de70048c
-(cherry picked from commit 679b28c2028b97604c6f1bdd6a716eaab4d55b37)
+Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  bcm.c | 47 +++++++++++++++++++++++++++--------------------
  1 file changed, 27 insertions(+), 20 deletions(-)

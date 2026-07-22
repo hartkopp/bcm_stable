@@ -1,9 +1,11 @@
-From 7a64e43be8cbf7d8a91f946186d2d5397f614579 Mon Sep 17 00:00:00 2001
+From 14a0f0f24957197c75652e1a72acc9ee9f2fda4b Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
 References: <2026072011-untruth-wrongly-ed18@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:31 +0200
 Subject: [PATCH 6.6.y 5/5] can: bcm: fix stale rx/tx ops after device removal
+
+commit 3b762c0d950383ab7a002686c9136b9aa55d2d70 upstream.
 
 RX: an RX_SETUP update(!) for an existing op skipped can_rx_register()
 unconditionally, even when a concurrent NETDEV_UNREGISTER had already
@@ -34,8 +36,7 @@ Link: https://patch.msgid.link/20260714-bcm_fixes-v15-9-562f7e3e42da@hartkopp.ne
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-Original-commit: 3b762c0d950383ab7a002686c9136b9aa55d2d70
-(cherry picked from commit d249d33128f22a74417d605baf6d9fa234a13265)
+Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  bcm.c | 54 ++++++++++++++++++++++++++++++++++++++++++++----------
  1 file changed, 44 insertions(+), 10 deletions(-)

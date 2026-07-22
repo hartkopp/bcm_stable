@@ -1,4 +1,4 @@
-From 772e394fa375404c9fde885bb2de76e283a0a1a1 Mon Sep 17 00:00:00 2001
+From a07ab4ae41242074de1160ca5e9e3fe6853b0383 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
 References: <2026072011-untruth-wrongly-ed18@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
@@ -60,6 +60,8 @@ Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
   here; the KCSAN-reported race (bcm_rx_setup() timer/filter updates
   and the RTR-frame snapshot in bcm_rx_handler()) is unaffected and
   fully addressed by the remaining locking. ]
+
+Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  bcm.c | 176 ++++++++++++++++++++++++++++++++++++++++++++--------------
  1 file changed, 133 insertions(+), 43 deletions(-)
