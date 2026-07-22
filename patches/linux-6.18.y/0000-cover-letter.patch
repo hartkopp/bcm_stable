@@ -1,8 +1,8 @@
-From 5966fc7e1ed04a036f2c45e7b51c49a1d74591e0 Mon Sep 17 00:00:00 2001
+From e80dd9327a705234ff03cb41c80e91d19062c1fa Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072010-winner-hurried-07df@gregkh>
 References: <2026072010-winner-hurried-07df@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 18:54:00 +0000
+Date: Wed, 22 Jul 2026 19:08:00 +0000
 Subject: [PATCH 6.18.y 0/8] can: bcm: backport of 8 patches that failed to
  apply to 6.18-stable
 
@@ -26,18 +26,25 @@ already-queued patches are in place; they were previously reported
 as FAILED for that missing-prerequisite reason alone, not for
 independent conflicts.
 
-Patch 5/8 ("add missing device refcount for CAN filter removal") is
-the one exception: upstream uses the netdevice_tracker/netdev_hold()/
-netdev_put() debug-tracking infra. Out of caution this series
-replaces it with the plain, always-available dev_hold()/dev_put(),
-which is functionally identical for the actual fix (holding a
-reference across a concurrent NETDEV_UNREGISTER) - just without the
-extra leak-tracking instrumentation. This mirrors the same adaptation
-made on the other branches in this series after an actual build
-failure was reported on 5.10.y ("error: unknown type name
-'netdevice_tracker'"); this revision has been verified with a clean
-git am against a seeded net/can/bcm.c and no longer references that
-type anywhere in the result.
+Two patches still needed adaptation for infra not available on
+6.18-stable. Patch 5/8 ("add missing device refcount for CAN filter
+removal"): upstream uses the netdevice_tracker/netdev_hold()/
+netdev_put() debug-tracking infra; replaced with the plain,
+always-available dev_hold()/dev_put(), functionally identical for
+the actual fix (holding a reference across a concurrent
+NETDEV_UNREGISTER) - just without the extra leak-tracking
+instrumentation. Patch 8/8 ("track a single source interface for
+ANYDEV timeout/throttle ops"): upstream reads skb->dev->reg_state via
+READ_ONCE(), which fails to compile here ("error: 'sizeof' applied to
+a bit-field") because reg_state is still a bit-field member of struct
+net_device on 6.18-stable; read as a plain field instead, which is
+functionally equivalent for this best-effort claim heuristic. Both
+adaptations mirror the same fixes made on the other branches in this
+series after actual build failures were reported on 5.10.y ("error:
+unknown type name 'netdevice_tracker'" and the reg_state 'sizeof'
+error); this revision has been verified with a clean git am against
+a seeded net/can/bcm.c and no longer references either problematic
+construct anywhere in the result.
 
 This assumes the 3 already-queued bcm.c patches for 6.18-stable have
 landed by the time this is applied. If not, please let me know and I
