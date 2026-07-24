@@ -1,6 +1,4 @@
 From c581273e5d4611e4ed0405b1897ff4a8eca5ff52 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072013-groggily-broker-cca7@gregkh>
-References: <2026072013-groggily-broker-cca7@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 5.15.y 0/9] can: bcm: backport of 9 patches that failed to

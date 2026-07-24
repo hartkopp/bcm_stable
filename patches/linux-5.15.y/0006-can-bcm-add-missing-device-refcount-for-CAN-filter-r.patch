@@ -1,4 +1,6 @@
 From 8ceb9a094bad82ae0081ce62cd79bfc3826ecfe3 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072039-residue-friction-b0c4@gregkh>
+References: <2026072039-residue-friction-b0c4@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
 Subject: [PATCH 6/9] can: bcm: add missing device refcount for CAN filter

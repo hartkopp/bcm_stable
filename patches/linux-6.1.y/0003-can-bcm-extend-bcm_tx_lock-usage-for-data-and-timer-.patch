@@ -1,4 +1,6 @@
 From 478faf5c8436e207292c69ef247e0a2510b7bd49 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072035-deport-copilot-2f3f@gregkh>
+References: <2026072035-deport-copilot-2f3f@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:28 +0200
 Subject: [PATCH 3/8] can: bcm: extend bcm_tx_lock usage for data and timer

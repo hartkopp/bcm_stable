@@ -1,4 +1,6 @@
 From 30b801d0e0862082405cb1b1916a02d7772c9385 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072007-scavenger-rockiness-3a12@gregkh>
+References: <2026072007-scavenger-rockiness-3a12@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:43 +0200
 Subject: [PATCH 2/2] can: isotp: serialize TX state transitions under

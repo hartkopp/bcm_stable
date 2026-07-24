@@ -1,4 +1,6 @@
 From d64bf855386ac13050210fd13b0781e83dddc8f6 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072034-name-yahoo-51a6@gregkh>
+References: <2026072034-name-yahoo-51a6@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:28 +0200
 Subject: [PATCH 3/8] can: bcm: extend bcm_tx_lock usage for data and timer

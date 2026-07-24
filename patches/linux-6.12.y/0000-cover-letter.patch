@@ -1,6 +1,4 @@
 From 5855bd20e06604eed01dec2399526bc7f4337295 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072011-atypical-tapping-9d9e@gregkh>
-References: <2026072011-atypical-tapping-9d9e@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 6.12.y 0/8] can: bcm: backport of 8 patches that failed to

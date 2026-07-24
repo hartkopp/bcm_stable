@@ -1,4 +1,6 @@
 From 755c47dc409c8e689a19f358a5eadb4bc7ed4273 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072057-dwelling-ripping-7c3f@gregkh>
+References: <2026072057-dwelling-ripping-7c3f@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:32 +0200
 Subject: [PATCH 7/8] can: bcm: fix data race on rx_stamp/rx_ifindex in

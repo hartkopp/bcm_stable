@@ -1,6 +1,4 @@
 From a3375e20e826bcc2ed7d4cb8b41d2dbc864cb377 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072054-egging-departed-3b24@gregkh>
-References: <2026072054-egging-departed-3b24@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 5.15.y 0/2] can: isotp: backport of 2 patches that failed to

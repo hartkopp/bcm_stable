@@ -1,4 +1,6 @@
 From f4899c024c4d3d1bddc37bc8a7cf0da29e55724f Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072038-herring-ruckus-b265@gregkh>
+References: <2026072038-herring-ruckus-b265@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
 Subject: [PATCH 5/8] can: bcm: add missing device refcount for CAN filter

@@ -1,4 +1,6 @@
 From b7f2c1f035a3302bc668c7dbce7de2dbfe4d91fb Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072008-footprint-colonize-8b69@gregkh>
+References: <2026072008-footprint-colonize-8b69@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:31 +0200
 Subject: [PATCH 6/8] can: bcm: fix stale rx/tx ops after device removal

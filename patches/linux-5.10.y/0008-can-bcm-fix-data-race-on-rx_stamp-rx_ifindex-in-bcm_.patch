@@ -1,4 +1,6 @@
 From 06cd7c1664ce9b732a421ae31678fca336818902 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072058-proxy-lubricant-2d2b@gregkh>
+References: <2026072058-proxy-lubricant-2d2b@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:32 +0200
 Subject: [PATCH 8/9] can: bcm: fix data race on rx_stamp/rx_ifindex in

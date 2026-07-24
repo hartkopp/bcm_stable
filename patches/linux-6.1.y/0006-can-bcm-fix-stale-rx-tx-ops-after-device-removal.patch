@@ -1,4 +1,6 @@
 From f04bb45caba12c859526bb14a4bb468eab868e11 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072009-earache-snowboard-eca7@gregkh>
+References: <2026072009-earache-snowboard-eca7@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:31 +0200
 Subject: [PATCH 6/8] can: bcm: fix stale rx/tx ops after device removal

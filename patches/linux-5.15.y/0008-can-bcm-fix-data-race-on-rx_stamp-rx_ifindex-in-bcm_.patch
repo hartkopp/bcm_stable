@@ -1,4 +1,6 @@
 From 7c50975f0a81b91676392181b2339d3c7225f888 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072058-tableful-statute-00d2@gregkh>
+References: <2026072058-tableful-statute-00d2@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:32 +0200
 Subject: [PATCH 8/9] can: bcm: fix data race on rx_stamp/rx_ifindex in

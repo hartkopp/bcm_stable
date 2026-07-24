@@ -1,4 +1,6 @@
 From cc251020eccb4b91682e439c63b23dc21ca6e528 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072012-repair-flip-109e@gregkh>
+References: <2026072012-repair-flip-109e@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:25 +0200
 Subject: [PATCH 1/8] can: bcm: add locking when updating filter and timer

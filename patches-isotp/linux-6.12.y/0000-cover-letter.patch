@@ -1,6 +1,4 @@
 From 88ea7cafbbb1047d67fc63e5880d171cacf8a862 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072053-chubby-luridness-4ba8@gregkh>
-References: <2026072053-chubby-luridness-4ba8@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 6.12.y 0/2] can: isotp: backport of 2 patches that failed to

@@ -1,4 +1,6 @@
 From 6d33ed33b25e220b811918b13e8af5bd0587aafc Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072047-area-pacifier-8bf6@gregkh>
+References: <2026072047-area-pacifier-8bf6@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:26 +0200
 Subject: [PATCH 3/9] can: bcm: fix CAN frame rx/tx statistics

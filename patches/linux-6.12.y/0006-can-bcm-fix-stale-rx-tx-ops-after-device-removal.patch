@@ -1,4 +1,6 @@
 From b43380ebb3e13e6ed7c5dfccaa3f390be0531d26 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072008-resonant-annoying-5010@gregkh>
+References: <2026072008-resonant-annoying-5010@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:31 +0200
 Subject: [PATCH 6/8] can: bcm: fix stale rx/tx ops after device removal

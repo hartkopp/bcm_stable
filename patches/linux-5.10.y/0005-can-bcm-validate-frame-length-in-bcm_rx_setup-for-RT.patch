@@ -1,4 +1,6 @@
 From 925a45d083c37b789ea29cd162a948786ed238c9 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072029-swimmable-robust-7e81@gregkh>
+References: <2026072029-swimmable-robust-7e81@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:29 +0200
 Subject: [PATCH 5/9] can: bcm: validate frame length in bcm_rx_setup() for RTR

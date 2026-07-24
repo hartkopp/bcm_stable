@@ -1,4 +1,6 @@
 From 79f732243573ca234d9cfbb8925791a5076bb7fd Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072010-directed-pastor-fedd@gregkh>
+References: <2026072010-directed-pastor-fedd@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:31 +0200
 Subject: [PATCH 7/9] can: bcm: fix stale rx/tx ops after device removal

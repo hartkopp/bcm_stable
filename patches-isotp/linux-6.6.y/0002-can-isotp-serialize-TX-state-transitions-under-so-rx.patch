@@ -1,4 +1,6 @@
 From 41aa1dab4464f8f0d041b4c51f06b38dc006b2d3 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072005-wagon-unless-5390@gregkh>
+References: <2026072005-wagon-unless-5390@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:43 +0200
 Subject: [PATCH 2/2] can: isotp: serialize TX state transitions under

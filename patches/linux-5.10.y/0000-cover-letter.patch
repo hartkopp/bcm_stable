@@ -1,6 +1,4 @@
 From d694035fea368d3c8cfe851ba2b74f7e36565954 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
-References: <2026072013-angled-grafted-e9e4@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 5.10.y 0/9] can: bcm: backport of 9 patches that failed to

@@ -1,6 +1,4 @@
 From d8b0ed53816c6ddad05932a9d74d6bba9195c756 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072011-untruth-wrongly-ed18@gregkh>
-References: <2026072011-untruth-wrongly-ed18@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 6.6.y 0/8] can: bcm: backport of 8 patches that failed to

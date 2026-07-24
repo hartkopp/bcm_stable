@@ -1,4 +1,6 @@
 From 79475433550b9fb06e59dd4ec17b75c499e3344f Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072053-chubby-luridness-4ba8@gregkh>
+References: <2026072053-chubby-luridness-4ba8@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:42 +0200
 Subject: [PATCH 1/2] can: isotp: fix use-after-free race with concurrent

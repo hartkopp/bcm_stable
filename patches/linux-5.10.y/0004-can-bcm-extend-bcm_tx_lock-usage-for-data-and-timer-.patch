@@ -1,4 +1,6 @@
 From 58f20415004a98aa79b7917b4d77da227410bf96 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072036-effects-shelve-85b0@gregkh>
+References: <2026072036-effects-shelve-85b0@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:28 +0200
 Subject: [PATCH 4/9] can: bcm: extend bcm_tx_lock usage for data and timer

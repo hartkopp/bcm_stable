@@ -1,4 +1,6 @@
 From 55f1737637e84f5082bb09fb23cf921fdf4accb6 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072041-silica-outing-8bb2@gregkh>
+References: <2026072041-silica-outing-8bb2@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
 Subject: [PATCH 6/9] can: bcm: add missing device refcount for CAN filter

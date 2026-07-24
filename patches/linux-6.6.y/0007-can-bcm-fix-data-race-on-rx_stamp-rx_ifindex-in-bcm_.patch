@@ -1,4 +1,6 @@
 From f93c2c5425bed5eee8ddd32b6eb434f9096194f8 Mon Sep 17 00:00:00 2001
+In-Reply-To: <2026072057-sulphuric-stumble-eadc@gregkh>
+References: <2026072057-sulphuric-stumble-eadc@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:32 +0200
 Subject: [PATCH 7/8] can: bcm: fix data race on rx_stamp/rx_ifindex in
