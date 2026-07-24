@@ -3,7 +3,7 @@ In-Reply-To: <2026072028-goldmine-rosy-2743@gregkh>
 References: <2026072028-goldmine-rosy-2743@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:29 +0200
-Subject: [PATCH 4/8] can: bcm: validate frame length in bcm_rx_setup() for RTR
+Subject: [PATCH 6.12.y 4/8] can: bcm: validate frame length in bcm_rx_setup() for RTR
  replies
 
 commit 62ec41f364648be79d54d94d0d240ee326948afd upstream.

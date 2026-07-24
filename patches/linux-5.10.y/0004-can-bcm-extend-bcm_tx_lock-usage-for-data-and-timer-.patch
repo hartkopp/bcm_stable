@@ -3,7 +3,7 @@ In-Reply-To: <2026072036-effects-shelve-85b0@gregkh>
 References: <2026072036-effects-shelve-85b0@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:28 +0200
-Subject: [PATCH 4/9] can: bcm: extend bcm_tx_lock usage for data and timer
+Subject: [PATCH 5.10.y 4/9] can: bcm: extend bcm_tx_lock usage for data and timer
  updates
 
 commit 12ce799f7ab1e05bd8fbf79e46f403bfe5597ebc upstream.

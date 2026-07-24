@@ -3,7 +3,7 @@ In-Reply-To: <2026072020-flatbed-griminess-cf8e@gregkh>
 References: <2026072020-flatbed-griminess-cf8e@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:33 +0200
-Subject: [PATCH 9/9] can: bcm: track a single source interface for ANYDEV
+Subject: [PATCH 5.10.y 9/9] can: bcm: track a single source interface for ANYDEV
  timeout/throttle ops
 
 commit 2f5976f54a04e9f18b25283036ac3136be453b17 upstream.

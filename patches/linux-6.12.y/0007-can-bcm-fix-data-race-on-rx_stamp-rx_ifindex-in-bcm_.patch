@@ -3,7 +3,7 @@ In-Reply-To: <2026072057-matchless-bungee-baa6@gregkh>
 References: <2026072057-matchless-bungee-baa6@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:32 +0200
-Subject: [PATCH 7/8] can: bcm: fix data race on rx_stamp/rx_ifindex in
+Subject: [PATCH 6.12.y 7/8] can: bcm: fix data race on rx_stamp/rx_ifindex in
  bcm_rx_handler()
 
 commit 58fd6cbc8541216af1d7ed272ea7ac2b66d50fd8 upstream.

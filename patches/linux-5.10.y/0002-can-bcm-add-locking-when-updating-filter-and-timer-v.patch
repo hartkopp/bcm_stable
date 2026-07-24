@@ -3,7 +3,7 @@ In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
 References: <2026072013-angled-grafted-e9e4@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:25 +0200
-Subject: [PATCH 2/9] can: bcm: add locking when updating filter and timer
+Subject: [PATCH 5.10.y 2/9] can: bcm: add locking when updating filter and timer
  values
 
 commit 749179c2e25b95d22499ed29096b3e02d6dfd2b4 upstream.

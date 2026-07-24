@@ -3,7 +3,7 @@ In-Reply-To: <2026072047-area-pacifier-8bf6@gregkh>
 References: <2026072047-area-pacifier-8bf6@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:26 +0200
-Subject: [PATCH 3/9] can: bcm: fix CAN frame rx/tx statistics
+Subject: [PATCH 5.15.y 3/9] can: bcm: fix CAN frame rx/tx statistics
 
 commit e6c24ba95fc3f1b5e1dcd28b1c6e59ef61a9daa5 upstream.
 

@@ -3,7 +3,7 @@ In-Reply-To: <2026072008-resonant-annoying-5010@gregkh>
 References: <2026072008-resonant-annoying-5010@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:31 +0200
-Subject: [PATCH 6/8] can: bcm: fix stale rx/tx ops after device removal
+Subject: [PATCH 6.12.y 6/8] can: bcm: fix stale rx/tx ops after device removal
 
 commit 3b762c0d950383ab7a002686c9136b9aa55d2d70 upstream.
 

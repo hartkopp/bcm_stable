@@ -3,7 +3,7 @@ In-Reply-To: <2026072006-tamer-earache-3354@gregkh>
 References: <2026072006-tamer-earache-3354@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:43 +0200
-Subject: [PATCH 2/2] can: isotp: serialize TX state transitions under
+Subject: [PATCH 6.1.y 2/2] can: isotp: serialize TX state transitions under
  so->rx_lock
 
 commit cf070fe33bfbd1a4c21236078fadb35dd223a157 upstream.
