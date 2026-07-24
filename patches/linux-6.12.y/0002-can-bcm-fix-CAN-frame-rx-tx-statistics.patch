@@ -1,4 +1,4 @@
-From 4f7a2e21071a11a4e185892f08b938885b565b74 Mon Sep 17 00:00:00 2001
+From 8643464708aa058410cc2a4222278f107646dd4c Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:26 +0200
 Subject: [PATCH 2/8] can: bcm: fix CAN frame rx/tx statistics
@@ -38,7 +38,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-4-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 69 +++++++++++++++++++++++++++++++++++++++--------------------

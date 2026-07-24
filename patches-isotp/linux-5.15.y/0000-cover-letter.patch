@@ -1,8 +1,8 @@
-From 11b3ca98108089263e5b5adfeb98945fb95225bf Mon Sep 17 00:00:00 2001
+From a3375e20e826bcc2ed7d4cb8b41d2dbc864cb377 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072054-egging-departed-3b24@gregkh>
 References: <2026072054-egging-departed-3b24@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 18:56:00 +0000
+Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 5.15.y 0/2] can: isotp: backport of 2 patches that failed to
  apply to 5.15-stable
 
@@ -17,33 +17,6 @@ patches from 7.2-rc3 minus the 1 already queued by the normal stable
 process for 5.15 ("can: isotp: use unconditional synchronize_rcu()
 in isotp_release()").
 
-Same scope as linux-5.10.y, with one difference: 5.15-stable already
-carries the sk_error_report() wrapper throughout isotp.c (unlike
-5.10, which still calls sk->sk_error_report(sk) directly), so
-isotp_tx_timeout() applies unmodified here. isotp_init() still needs
-adaptation for the same two independent, not-backported prerequisites
-as on 5.10.y: the dynamic max_pdu_size TX buffer resize (commits
-2f2dd39 "can: isotp: set max PDU size to 64 kByte", 2022, and
-973bb01 "can: isotp: add module parameter for maximum pdu size",
-2023, neither Cc: stable) and the hrtimer_setup() API consolidation.
-The corresponding hunks are omitted or adapted to the older code
-shape; the actual race fixes themselves are unaffected and fully
-applied. See each patch's changelog for the exact adaptation.
-
-Patch 1/2 ("fix use-after-free race with concurrent
-NETDEV_UNREGISTER") is additionally adapted: upstream uses the
-netdevice_tracker/netdev_hold()/netdev_put() debug-tracking infra,
-which is not available on 5.15-stable. Replaced with the plain,
-always-available dev_hold()/dev_put(), which is functionally
-identical for the actual fix (holding a reference across a
-concurrent NETDEV_UNREGISTER) - just without the extra leak-tracking
-instrumentation. This mirrors the same adaptation made to the bcm.c
-patch series and to isotp.c on 5.10.y, after an actual build failure
-was reported there ("error: unknown type name 'netdevice_tracker'");
-this revision has been verified with a clean git am against a seeded
-net/can/isotp.c and no longer references that type anywhere in the
-result.
-
 This assumes the 1 already-queued isotp.c patch for 5.15-stable has
 landed by the time this is applied. If not, please let me know and I
 will rebase.
@@ -55,6 +28,6 @@ Oliver Hartkopp (2):
  net/can/isotp.c | 280 ++++++++++++++++++++++++++++++++++++++++++--------------
  1 file changed, 213 insertions(+), 67 deletions(-)
 
---
+-- 
 2.43.0
 

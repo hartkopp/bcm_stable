@@ -1,4 +1,4 @@
-From f5f6beb211da46cca8c80985dd6346f677355dc0 Mon Sep 17 00:00:00 2001
+From 5855bd20e06604eed01dec2399526bc7f4337295 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:33 +0200
 Subject: [PATCH 8/8] can: bcm: track a single source interface for ANYDEV
@@ -39,15 +39,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-11-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ READ_ONCE() cannot be applied to skb->dev->reg_state on this
-  branch, where reg_state is a bit-field member of struct
-  net_device ("sizeof applied to a bit-field" compile error).
-  Read it as a plain field instead - this is a single scalar
-  read used only as a best-effort claim heuristic (the actual
-  correctness of the fix does not depend on the compiler barrier
-  READ_ONCE() would add here). ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 49 ++++++++++++++++++++++++++++++++++++++++++++-----

@@ -1,4 +1,4 @@
-From 98117f9ff9ae6385f975eb00f534b7028fd89104 Mon Sep 17 00:00:00 2001
+From ae4d5db325e1b3246e7856ef3fcc62087980a714 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:42 +0200
 Subject: [PATCH 1/2] can: isotp: fix use-after-free race with concurrent
@@ -38,15 +38,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260712-isotp-fixes-v10-2-793a1b1ce17f@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ netdevice_tracker/netdev_hold()/netdev_put() are not available on
-  this branch. Use the plain, always-available dev_hold()/dev_put()
-  instead - functionally identical for this fix's actual purpose
-  (holding a reference across a concurrent NETDEV_UNREGISTER), just
-  without the extra leak-tracking instrumentation. The dev_tracker
-  struct member is dropped accordingly, since dev_hold()/dev_put()
-  need no tracker object. ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/isotp.c | 88 ++++++++++++++++++++++++++++++++++++++-------------------

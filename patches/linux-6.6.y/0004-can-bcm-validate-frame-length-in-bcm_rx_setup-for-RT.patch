@@ -1,4 +1,4 @@
-From efbaec76170c3ea12e7e315ace40ad87514051b9 Mon Sep 17 00:00:00 2001
+From 678e0addac0d5a4e2c968f65d9f0497641eb791c Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:29 +0200
 Subject: [PATCH 4/8] can: bcm: validate frame length in bcm_rx_setup() for RTR
@@ -16,7 +16,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-7-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 59 +++++++++++++++++++++++++++++++++++++++++------------------

@@ -1,8 +1,8 @@
-From 6fc382c5f3f68b0fbf4ced9853d53de4184da37e Mon Sep 17 00:00:00 2001
+From 88ea7cafbbb1047d67fc63e5880d171cacf8a862 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072053-chubby-luridness-4ba8@gregkh>
 References: <2026072053-chubby-luridness-4ba8@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 18:59:00 +0000
+Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 6.12.y 0/2] can: isotp: backport of 2 patches that failed to
  apply to 6.12-stable
 
@@ -17,27 +17,6 @@ patches from 7.2-rc3 minus the 1 already queued by the normal stable
 process for 6.12 ("can: isotp: use unconditional synchronize_rcu()
 in isotp_release()").
 
-Same scope as linux-6.6.y: the dynamic max_pdu_size TX buffer resize
-feature is already present here. Patch 2/2 still needs the
-hrtimer_setup() adaptation, since that API consolidation lands
-between 6.12 and 6.18 (same finding as for the bcm.c patches on this
-branch). The actual race fixes themselves are unaffected and fully
-applied. See each patch's changelog for details.
-
-Patch 1/2 ("fix use-after-free race with concurrent
-NETDEV_UNREGISTER") is additionally adapted: upstream uses the
-netdevice_tracker/netdev_hold()/netdev_put() debug-tracking infra.
-Out of caution this series replaces it with the plain,
-always-available dev_hold()/dev_put(), which is functionally
-identical for the actual fix (holding a reference across a
-concurrent NETDEV_UNREGISTER) - just without the extra leak-tracking
-instrumentation. This mirrors the same adaptation made to the bcm.c
-patch series and to isotp.c on the older branches, after an actual
-build failure was reported on 5.10.y ("error: unknown type name
-'netdevice_tracker'"); this revision has been verified with a clean
-git am against a seeded net/can/isotp.c and no longer references
-that type anywhere in the result.
-
 This assumes the 1 already-queued isotp.c patch for 6.12-stable has
 landed by the time this is applied. If not, please let me know and I
 will rebase.
@@ -49,6 +28,6 @@ Oliver Hartkopp (2):
  net/can/isotp.c | 280 ++++++++++++++++++++++++++++++++++++++++++--------------
  1 file changed, 213 insertions(+), 67 deletions(-)
 
---
+-- 
 2.43.0
 

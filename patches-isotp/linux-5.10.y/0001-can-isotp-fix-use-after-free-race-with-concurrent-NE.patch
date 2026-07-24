@@ -1,4 +1,4 @@
-From fa2f8ab6131a3c34658d306a74706dc8b29aebda Mon Sep 17 00:00:00 2001
+From e3016a1d37b50db17872a4d617c4c16cbad0a5de Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:42 +0200
 Subject: [PATCH 1/2] can: isotp: fix use-after-free race with concurrent
@@ -38,26 +38,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260712-isotp-fixes-v10-2-793a1b1ce17f@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ Upstream inserts the so->bound re-validation right before the
-  dynamic max_pdu_size buffer-resize logic in isotp_sendmsg(),
-  introduced by commits 2f2dd39 ("can: isotp: set max PDU size to
-  64 kByte", 2022) and 973bb01 ("can: isotp: add module parameter
-  for maximum pdu size", 2023), neither Cc: stable and neither
-  present on this branch (5.10 predates both). The re-validation is
-  applied against the older fixed MAX_MSG_LENGTH check instead; the
-  actual UAF fix (so->dev/so->dev_tracker reference holding,
-  rtnl_lock() serialization, READ_ONCE(dev->mtu)) is unrelated to
-  that buffer-sizing feature and fully applied unmodified. ]
-
-[ netdevice_tracker/netdev_hold()/netdev_put() are not available on
-  this branch. Use the plain, always-available dev_hold()/dev_put()
-  instead - functionally identical for this fix's actual purpose
-  (holding a reference across a concurrent NETDEV_UNREGISTER), just
-  without the extra leak-tracking instrumentation. The dev_tracker
-  struct member is dropped accordingly, since dev_hold()/dev_put()
-  need no tracker object. ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/isotp.c | 88 ++++++++++++++++++++++++++++++++++++++-------------------

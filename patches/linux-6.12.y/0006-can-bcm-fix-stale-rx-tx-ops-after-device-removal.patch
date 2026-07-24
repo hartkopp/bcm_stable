@@ -1,4 +1,4 @@
-From 3a2e30daf029353639bbde4bb0a02e48bd7d4906 Mon Sep 17 00:00:00 2001
+From b43380ebb3e13e6ed7c5dfccaa3f390be0531d26 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:31 +0200
 Subject: [PATCH 6/8] can: bcm: fix stale rx/tx ops after device removal
@@ -33,7 +33,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-9-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 54 ++++++++++++++++++++++++++++++++++++++++++++----------

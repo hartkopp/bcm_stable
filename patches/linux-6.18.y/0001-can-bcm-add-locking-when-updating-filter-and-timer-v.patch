@@ -1,4 +1,4 @@
-From ae77b830559474243eb91642088fdc149ace9c9f Mon Sep 17 00:00:00 2001
+From 608f2ba2842387b860c85a79d7ee6ea4270262b3 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:25 +0200
 Subject: [PATCH 1/8] can: bcm: add locking when updating filter and timer
@@ -49,7 +49,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-3-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 176 ++++++++++++++++++++++++++++++++++++++++++++--------------

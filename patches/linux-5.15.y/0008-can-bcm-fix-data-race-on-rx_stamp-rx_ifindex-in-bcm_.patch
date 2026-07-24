@@ -1,4 +1,4 @@
-From 74f3fab40f24ea5899a66a579c8b313deca68975 Mon Sep 17 00:00:00 2001
+From 7c50975f0a81b91676392181b2339d3c7225f888 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:32 +0200
 Subject: [PATCH 8/9] can: bcm: fix data race on rx_stamp/rx_ifindex in
@@ -31,14 +31,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-10-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ Same adaptation as on 6.6.y/5.10.y: upstream also moves the
-  traffic_flags/RX_LOCAL/RX_OWN computation into this same
-  critical section; that code does not exist on this branch (see
-  the patch adding bcm_rx_update_lock earlier in this series) and
-  is omitted. The rx_stamp/rx_ifindex race fix itself is
-  unaffected. ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 13 ++++++++-----

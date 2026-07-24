@@ -1,8 +1,8 @@
-From 3b4e3bb11500c59d7f2945bc9faf8ef8d10e5b9c Mon Sep 17 00:00:00 2001
+From d694035fea368d3c8cfe851ba2b74f7e36565954 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072013-angled-grafted-e9e4@gregkh>
 References: <2026072013-angled-grafted-e9e4@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 19:03:00 +0000
+Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 5.10.y 0/9] can: bcm: backport of 9 patches that failed to
  apply to 5.10-stable
 
@@ -15,59 +15,6 @@ of 11 upstream bcm.c patches from 7.2-rc3 minus the 2 already queued
 by the normal stable process for 5.10 ("can: bcm: fix lockless
 bound/ifindex race and silent RX_SETUP failure", "can: bcm: add
 missing rcu list annotations and operations").
-
-Note that patch 1/9 ("defer rx_op deallocation to workqueue") is
-also adapted here, unlike on newer branches (6.1.y and later) where
-it applies unmodified: 5.10-stable never received the unrelated
-commit edd1a7e42f1d2 ("can: bcm: registration process optimization
-in bcm_module_init()", no Cc: stable), which reworked
-bcm_module_init()/bcm_module_exit() into a goto-based, error-checked
-unwind chain. This patch's workqueue-cleanup addition is applied
-directly to the older, unrefactored module_init/module_exit
-structure instead; see the patch changelog for details.
-
-Patches 2, 3, 8 and 9 differ from their upstream commits the same
-way as on 6.6.y: upstream additionally threads a traffic_flags/
-RX_LOCAL/RX_OWN computation through bcm_rx_handler(), introduced by
-commit fec846fa7eddf7bb651bf88bd78c7db1410ae3b1 ("can: bcm: add
-recvmsg flags for own, local and remote traffic"), which is not
-present on 5.10-stable and not itself a stable candidate (pure
-feature addition, no Cc: stable). The traffic_flags-related hunks
-are omitted in each of these four patches; the actual fixes they
-contain are unaffected and fully applied. Patch 2/9 also required
-one further manual re-anchor in bcm_rx_thr_handler(), which had not
-yet gone through an unrelated refactor present on newer branches.
-
-Patch 6/9 ("add missing device refcount for CAN filter removal") is
-additionally adapted: upstream uses the netdevice_tracker/
-netdev_hold()/netdev_put() debug-tracking infra, which is not
-available on 5.10-stable (that infra landed well after this kernel
-was released). Replaced with the plain, always-available dev_hold()/
-dev_put(), which is functionally identical for the actual fix
-(holding a reference across a concurrent NETDEV_UNREGISTER) - just
-without the extra leak-tracking instrumentation. Confirmed by an
-actual build error when applying an earlier version of this patch
-set to a real 5.10.260 tree ("error: unknown type name
-'netdevice_tracker'"); this revision has been verified with a clean
-git am against a seeded net/can/bcm.c and no longer references that
-type anywhere in the result.
-
-Patch 9/9 ("track a single source interface for ANYDEV
-timeout/throttle ops") is likewise adapted: upstream reads
-skb->dev->reg_state via READ_ONCE(), which fails to compile on
-5.10-stable ("error: 'sizeof' applied to a bit-field") because
-reg_state is declared as a bit-field member of struct net_device on
-this branch. Reads it as a plain field instead, which is
-functionally equivalent for this best-effort claim heuristic (the
-correctness of the actual fix does not depend on the compiler
-barrier READ_ONCE() would add here). Confirmed by an actual build
-error against the same real 5.10.260 tree; this revision has been
-verified with a clean git am against a seeded net/can/bcm.c.
-
-Patches 4-7 are unmodified backports that apply cleanly once 2/9 is
-in place; they were previously reported as FAILED for the same
-underlying reason (missing bcm_rx_update_lock prerequisite), not for
-independent conflicts.
 
 This assumes the 2 already-queued bcm.c patches for 5.10-stable have
 landed by the time this is applied. If not, please let me know and I
@@ -90,6 +37,6 @@ Oliver Hartkopp (8):
  net/can/bcm.c | 558 ++++++++++++++++++++++++++++++++++++++++++++--------------
  1 file changed, 425 insertions(+), 133 deletions(-)
 
---
+-- 
 2.43.0
 

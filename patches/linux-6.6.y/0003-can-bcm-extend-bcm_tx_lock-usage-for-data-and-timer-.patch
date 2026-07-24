@@ -1,4 +1,4 @@
-From 8fe3c74b23fdec4974236c6d3cff89aa468726ea Mon Sep 17 00:00:00 2001
+From ea4d1a95da63de09ec7cc6bb8fb90435cb219f6a Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:28 +0200
 Subject: [PATCH 3/8] can: bcm: extend bcm_tx_lock usage for data and timer
@@ -25,7 +25,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-6-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 104 ++++++++++++++++++++++++++++++++++++++++++----------------

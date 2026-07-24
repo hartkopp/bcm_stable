@@ -1,4 +1,4 @@
-From bb3caa2c9e15ff97d744ef6b847caf0672a5cbd1 Mon Sep 17 00:00:00 2001
+From e1040d7bf3199734e68c30260b504534d4f2099c Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
 Subject: [PATCH 5/8] can: bcm: add missing device refcount for CAN filter
@@ -31,15 +31,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-8-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ netdevice_tracker/netdev_hold()/netdev_put() are not available on
-  this branch. Use the plain, always-available dev_hold()/dev_put()
-  instead - functionally identical for this fix's actual purpose
-  (holding a reference across a concurrent NETDEV_UNREGISTER), just
-  without the extra leak-tracking instrumentation. The
-  rx_reg_dev_tracker struct member is dropped accordingly, since
-  dev_hold()/dev_put() need no tracker object. ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 44 ++++++++++++++++++++++++--------------------

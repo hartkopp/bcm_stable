@@ -1,4 +1,4 @@
-From a6313967cb3cffedad9e5dcf3a0d7d15ba32815a Mon Sep 17 00:00:00 2001
+From 6861b73aac6329084072124ccbcd351838494cdb Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:26 +0200
 Subject: [PATCH 2/8] can: bcm: fix CAN frame rx/tx statistics
@@ -38,14 +38,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-4-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-[ The traffic_flags/RX_LOCAL/RX_OWN computation referenced in
-  upstream's commit message does not exist on this branch (see
-  the patch adding bcm_rx_update_lock earlier in this series);
-  the redundant second bcm_rx_update_lock acquire/release it
-  describes is the one introduced by that earlier patch here,
-  and is removed the same way upstream removes it. No
-  functional difference to upstream's outcome. ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 67 +++++++++++++++++++++++++++++++++++++++--------------------

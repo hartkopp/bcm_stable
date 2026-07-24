@@ -1,4 +1,4 @@
-From 11b3ca98108089263e5b5adfeb98945fb95225bf Mon Sep 17 00:00:00 2001
+From a3375e20e826bcc2ed7d4cb8b41d2dbc864cb377 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:43 +0200
 Subject: [PATCH 2/2] can: isotp: serialize TX state transitions under
@@ -42,21 +42,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260712-isotp-fixes-v10-3-793a1b1ce17f@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ Unlike on 5.10.y, this branch already has the sk_error_report()
-  wrapper in use throughout the file, so isotp_tx_timeout() applies
-  unmodified. isotp_init() still needed adaptation: upstream context
-  includes so->rx.buf/tx.buf/buflen initialization from the dynamic
-  max_pdu_size buffer feature (commit 973bb01, "can: isotp: add
-  module parameter for maximum pdu size", 2023, no Cc: stable, not
-  present on this branch, same as already noted for the previous
-  patch in this series); those lines are omitted, and the new
-  so->echotimer initialization is done with hrtimer_init()+
-  .function= instead of hrtimer_setup(), matching how the other
-  timers in this function are still initialized here (unrelated
-  hrtimer_setup() API consolidation, also not on this branch). No
-  functional difference to the actual TX-state serialization fix. ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/isotp.c | 192 +++++++++++++++++++++++++++++++++++++++++++++-----------

@@ -1,8 +1,8 @@
-From f5f6beb211da46cca8c80985dd6346f677355dc0 Mon Sep 17 00:00:00 2001
+From 5855bd20e06604eed01dec2399526bc7f4337295 Mon Sep 17 00:00:00 2001
 In-Reply-To: <2026072011-atypical-tapping-9d9e@gregkh>
 References: <2026072011-atypical-tapping-9d9e@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Wed, 22 Jul 2026 19:07:00 +0000
+Date: Fri, 24 Jul 2026 09:00:00 +0000
 Subject: [PATCH 6.12.y 0/8] can: bcm: backport of 8 patches that failed to
  apply to 6.12-stable
 
@@ -16,38 +16,6 @@ by the normal stable process for 6.12 ("can: bcm: defer rx_op
 deallocation to workqueue to fix thrtimer UAF", "can: bcm: fix
 lockless bound/ifindex race and silent RX_SETUP failure", "can: bcm:
 add missing rcu list annotations and operations").
-
-Unlike linux-5.10.y/5.15.y/6.1.y/6.6.y, none of these 8 patches
-needed content adaptation for the traffic_flags/RX_LOCAL/RX_OWN
-context: 6.12-stable already carries commit
-fec846fa7eddf7bb651bf88bd78c7db1410ae3b1 ("can: bcm: add recvmsg
-flags for own, local and remote traffic", Jan 2024) as part of its
-own baseline (6.12 was cut well after that commit landed), so the
-traffic_flags context that made several of these patches conflict on
-older branches is already present here. All 8 patches apply cleanly
-once the 3 already-queued patches are in place; they were previously
-reported as FAILED for that missing-prerequisite reason alone, not
-for independent conflicts.
-
-Two patches still needed adaptation for infra not available on
-6.12-stable. Patch 5/8 ("add missing device refcount for CAN filter
-removal"): upstream uses the netdevice_tracker/netdev_hold()/
-netdev_put() debug-tracking infra; replaced with the plain,
-always-available dev_hold()/dev_put(), which is functionally
-identical for the actual fix (holding a reference across a
-concurrent NETDEV_UNREGISTER) - just without the extra leak-tracking
-instrumentation. Patch 8/8 ("track a single source interface for
-ANYDEV timeout/throttle ops"): upstream reads skb->dev->reg_state via
-READ_ONCE(), which fails to compile here ("error: 'sizeof' applied to
-a bit-field") because reg_state is a bit-field member of struct
-net_device on this branch; read as a plain field instead, which is
-functionally equivalent for this best-effort claim heuristic. Both
-adaptations mirror the same fixes made on 5.10.y after actual build
-failures were reported there ("error: unknown type name
-'netdevice_tracker'" and the reg_state 'sizeof' error); this revision
-has been verified with a clean git am against a seeded net/can/bcm.c
-and no longer references either problematic construct anywhere in
-the result.
 
 This assumes the 3 already-queued bcm.c patches for 6.12-stable have
 landed by the time this is applied. If not, please let me know and I
@@ -67,6 +35,6 @@ Oliver Hartkopp (8):
  net/can/bcm.c | 520 +++++++++++++++++++++++++++++++++++++++++++---------------
  1 file changed, 391 insertions(+), 129 deletions(-)
 
---
+-- 
 2.43.0
 

@@ -1,4 +1,4 @@
-From 34229a64a12b4661ce26bcd8b9d1b0a92ae7b842 Mon Sep 17 00:00:00 2001
+From 29ff1b9674b48a179101c94bc9132e1bca338314 Mon Sep 17 00:00:00 2001
 From: Lee Jones <lee@kernel.org>
 Date: Tue, 14 Jul 2026 18:55:23 +0200
 Subject: [PATCH 1/9] can: bcm: defer rx_op deallocation to workqueue to fix
@@ -44,19 +44,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-1-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ 5.10-stable never received commit edd1a7e42f1d2 ("can: bcm:
-  registration process optimization in bcm_module_init()", no
-  Cc: stable), which reordered bcm_module_init()/bcm_module_exit()
-  into a goto-based, error-checked unwind chain that the upstream
-  diff for this commit builds on to add the bcm_wq cleanup path.
-  Adapted to the older, unrefactored 5.10 module_init/module_exit
-  structure instead: destroy_workqueue(bcm_wq) is added directly to
-  the single existing can_proto_register() failure path, and to
-  module_exit() as upstream does. No functional difference to
-  upstream's outcome (no workqueue leak on module init failure or
-  unload). ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 36 +++++++++++++++++++++++++++++++++---

@@ -1,4 +1,4 @@
-From 6fc382c5f3f68b0fbf4ced9853d53de4184da37e Mon Sep 17 00:00:00 2001
+From 88ea7cafbbb1047d67fc63e5880d171cacf8a862 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:43 +0200
 Subject: [PATCH 2/2] can: isotp: serialize TX state transitions under
@@ -42,15 +42,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260712-isotp-fixes-v10-3-793a1b1ce17f@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ Same as on 6.6.y: the dynamic max_pdu_size buffer feature is
-  already present, but the hrtimer_setup() API consolidation is
-  not yet on this branch (lands between 6.12 and 6.18, same finding
-  as for the bcm.c patches). The new so->echotimer is initialized
-  with hrtimer_init()+.function= instead, matching the other timers
-  in this function here. No functional difference to the actual
-  TX-state serialization fix. ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/isotp.c | 192 +++++++++++++++++++++++++++++++++++++++++++++-----------

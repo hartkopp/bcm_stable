@@ -1,4 +1,4 @@
-From 4d8795ea817567f11f239ae5353897f0bca3c1c4 Mon Sep 17 00:00:00 2001
+From fdd242f353f2cb516bec94580f611c1375693fa1 Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:25 +0200
 Subject: [PATCH 2/9] can: bcm: add locking when updating filter and timer
@@ -49,19 +49,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260714-bcm_fixes-v15-3-562f7e3e42da@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ Same adaptation as on 6.6.y and 5.10.y: the
-  traffic_flags/RX_LOCAL/RX_OWN computation referenced in
-  upstream's commit message does not exist on this branch (see
-  commit fec846fa7eddf7bb651bf88bd78c7db1410ae3b1, "can: bcm: add
-  recvmsg flags for own, local and remote traffic", not present
-  here, no Cc: stable). That hunk and the redundant second
-  bcm_rx_update_lock acquire it would otherwise need are omitted.
-  bcm_rx_thr_handler() also required the same manual re-anchoring
-  as on 5.10.y (older direct-return structure, no unrelated
-  refactor present yet). No functional difference to upstream's
-  outcome. ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/bcm.c | 178 +++++++++++++++++++++++++++++++++++++++++++---------------
