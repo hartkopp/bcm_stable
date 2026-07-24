@@ -1,6 +1,6 @@
 From 29ff1b9674b48a179101c94bc9132e1bca338314 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072027-showroom-maggot-c452@gregkh>
-References: <2026072027-showroom-maggot-c452@gregkh>
+In-Reply-To: <2026072037-bagginess-bluish-c081@gregkh>
+References: <2026072037-bagginess-bluish-c081@gregkh>
 From: Lee Jones <lee@kernel.org>
 Date: Tue, 14 Jul 2026 18:55:23 +0200
 Subject: [PATCH 1/9] can: bcm: defer rx_op deallocation to workqueue to fix
