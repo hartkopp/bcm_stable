@@ -1,6 +1,4 @@
 From a8da8c9afba32a1ed179c65877bf4b94723d3e4d Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072046-absolve-unsorted-3f5d@gregkh>
-References: <2026072046-absolve-unsorted-3f5d@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:26 +0200
 Subject: [PATCH 6.1.y 2/8] can: bcm: fix CAN frame rx/tx statistics

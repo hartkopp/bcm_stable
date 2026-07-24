@@ -1,6 +1,4 @@
 From 39b2f72c5ac2379d2a82677fb7788a0f9b9a0897 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072029-luminance-darkening-4c27@gregkh>
-References: <2026072029-luminance-darkening-4c27@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:29 +0200
 Subject: [PATCH 6.1.y 4/8] can: bcm: validate frame length in bcm_rx_setup() for RTR

@@ -57,10 +57,17 @@ git format-patch --subject-prefix="PATCH 6.6.y" \
 ## Versenden
 
 ```sh
-git send-email --to='stable@vger.kernel.org' patches/linux-6.6.y/000*.patch
+git send-email --suppress-cc=all --confirm=always --thread=shallow \
+  --to='stable@vger.kernel.org' \
+  --cc="Oliver Hartkopp <socketcan@hartkopp.net>","Marc Kleine-Budde <mkl@pengutronix.de>" \
+  patches/linux-6.6.y/000*.patch
 ```
 
-`git send-email` erkennt die `In-Reply-To:`/`References:`-Header in den
-Dateien automatisch und fädelt die Mails korrekt in den bestehenden
-Thread ein; `--in-reply-to` muss auf der Kommandozeile nicht nochmal
-angegeben werden.
+Nur `0001` trägt `In-Reply-To`/`References` auf die FAILED-Mail dieses
+Patch-Sets; `_0000-cover-letter.patch` wird nicht mitgeschickt (Präfix
+`_`, daher außerhalb des `000*`-Glob, dient nur noch als Doku hier im
+Repo). `--thread=shallow` lässt `git send-email` `0002`-`000N`
+automatisch als Antworten auf `0001` einfädeln (`In-Reply-To` =
+Message-ID von `0001`, `References` = FAILED-Mail + `0001`) - so
+entsteht ein einzelner zusammenhängender Thread, ohne dass wir die
+Message-ID von `0001` vorher kennen müssten.

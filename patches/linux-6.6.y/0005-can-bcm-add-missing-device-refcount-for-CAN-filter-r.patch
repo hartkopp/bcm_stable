@@ -1,6 +1,4 @@
 From e1040d7bf3199734e68c30260b504534d4f2099c Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072038-cosmos-bulge-2f0e@gregkh>
-References: <2026072038-cosmos-bulge-2f0e@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
 Subject: [PATCH 6.6.y 5/8] can: bcm: add missing device refcount for CAN filter

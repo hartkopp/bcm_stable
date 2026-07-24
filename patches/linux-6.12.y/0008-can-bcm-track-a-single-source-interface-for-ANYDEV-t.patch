@@ -1,6 +1,4 @@
 From 5855bd20e06604eed01dec2399526bc7f4337295 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072018-exquisite-pouch-b739@gregkh>
-References: <2026072018-exquisite-pouch-b739@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:33 +0200
 Subject: [PATCH 6.12.y 8/8] can: bcm: track a single source interface for ANYDEV

@@ -1,6 +1,4 @@
 From 88de12dfa0499afc77452bc36a319ceaea2f4a1d Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072018-crouch-islamic-d0cb@gregkh>
-References: <2026072018-crouch-islamic-d0cb@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:33 +0200
 Subject: [PATCH 6.18.y 8/8] can: bcm: track a single source interface for ANYDEV

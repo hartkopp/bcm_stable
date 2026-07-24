@@ -1,6 +1,4 @@
 From cb2cc63b4c829f4321de67e1e0af3c48dd6d6e79 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072056-posing-gown-1aaf@gregkh>
-References: <2026072056-posing-gown-1aaf@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:32 +0200
 Subject: [PATCH 6.18.y 7/8] can: bcm: fix data race on rx_stamp/rx_ifindex in

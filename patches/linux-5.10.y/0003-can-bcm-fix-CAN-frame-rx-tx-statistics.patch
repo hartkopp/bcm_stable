@@ -1,6 +1,4 @@
 From 4473d3c98e0e3be8c3038cc24e67c1426c2c0880 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072047-expanse-drool-9060@gregkh>
-References: <2026072047-expanse-drool-9060@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:26 +0200
 Subject: [PATCH 5.10.y 3/9] can: bcm: fix CAN frame rx/tx statistics

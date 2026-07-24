@@ -1,6 +1,4 @@
 From c3c9a6d2b2e57c1eb9ca2b4657de7a14274981de Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072019-parched-village-5f94@gregkh>
-References: <2026072019-parched-village-5f94@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:33 +0200
 Subject: [PATCH 6.1.y 8/8] can: bcm: track a single source interface for ANYDEV

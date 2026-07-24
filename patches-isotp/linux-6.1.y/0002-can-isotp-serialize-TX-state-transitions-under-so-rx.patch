@@ -1,6 +1,4 @@
 From cea04a53c938b2c57534bcd293fa6b0f7a8162d3 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072006-tamer-earache-3354@gregkh>
-References: <2026072006-tamer-earache-3354@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:43 +0200
 Subject: [PATCH 6.1.y 2/2] can: isotp: serialize TX state transitions under

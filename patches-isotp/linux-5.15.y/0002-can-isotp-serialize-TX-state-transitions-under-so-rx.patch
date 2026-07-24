@@ -1,6 +1,4 @@
 From a3375e20e826bcc2ed7d4cb8b41d2dbc864cb377 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072006-monotone-overhung-fb4f@gregkh>
-References: <2026072006-monotone-overhung-fb4f@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Sun, 12 Jul 2026 19:59:43 +0200
 Subject: [PATCH 5.15.y 2/2] can: isotp: serialize TX state transitions under

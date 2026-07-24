@@ -1,6 +1,4 @@
 From d035f4a492a7b188accb6ef979b5c4f46e28e627 Mon Sep 17 00:00:00 2001
-In-Reply-To: <2026072038-arrest-crowbar-f910@gregkh>
-References: <2026072038-arrest-crowbar-f910@gregkh>
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Tue, 14 Jul 2026 18:55:30 +0200
 Subject: [PATCH 6.1.y 5/8] can: bcm: add missing device refcount for CAN filter
