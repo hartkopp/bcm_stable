@@ -46,11 +46,29 @@ als abschließende Zeile ergänzt. Das ist eine persönliche
 DCO-Zusicherung — bitte vor dem Versenden den Patch nochmal wirklich
 gegenlesen, bevor er raus geht.
 
+## Anwenden auf einen echten 6.18.y-Baum
+
+`0001-...patch` setzt auf allen drei bereits gelandeten isotp.c-Patches
+aus derselben Upstream-Serie auf (`9b1a02e0d980`, `20bab8b88baa`,
+`cf070fe33bfb` — siehe `mail/STATUS.md`). In einem lokalen
+`linux-stable`-Checkout, der diese noch nicht enthält, vorher
+`cherrypick.sh` ausführen:
+
+```sh
+cd /pfad/zum/linux-stable-checkout
+sh /pfad/zu/diesem/repo/patches-isotp/linux-6.18.y/cherrypick.sh
+git am /pfad/zu/diesem/repo/patches-isotp/linux-6.18.y/0001-*.patch
+```
+
 ## Vor dem Versenden unbedingt prüfen
 
-Test-Build/-Boot auf echtem 6.18.y-Baum, wie von den Stable-Regeln
-verlangt — das kann von hier aus nicht geprüft werden (kein
-Kernel-Build-Environment in diesem Repo).
+1. **Sind die drei Voraussetzungs-Commits in der Zielversion von
+   6.18.y, gegen die tatsächlich versendet wird, schon wirklich
+   gelandet** (nicht nur in dem hier verwendeten Referenzstand)? Sonst
+   `cherrypick.sh` wie oben vorschalten bzw. im Cover-Text erwähnen.
+2. Test-Build/-Boot auf echtem 6.18.y-Baum, wie von den Stable-Regeln
+   verlangt — das kann von hier aus nicht geprüft werden (kein
+   Kernel-Build-Environment in diesem Repo).
 
 Zum Nachbauen/Anpassen des Patches (z.B. nach einem Rebase):
 
