@@ -1,4 +1,4 @@
-From 0158f5ff04f7b2030f1acb534e3ab42bc66dbeda Mon Sep 17 00:00:00 2001
+From caadade47fef4c9f5a81466afb3f88618ee5783e Mon Sep 17 00:00:00 2001
 From: Oliver Hartkopp <socketcan@hartkopp.net>
 Date: Fri, 24 Jul 2026 20:15:25 +0200
 Subject: [PATCH 6.18.y] can: isotp: fix timer drain order, wakeup handling and
@@ -49,16 +49,6 @@ Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 Link: https://patch.msgid.link/20260724181525.43556-1-socketcan@hartkopp.net
 Cc: stable@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-[ Upstream sets skb->hash via the generic can_set_skb_uid() helper
-  (commit d4fb6514ff8ed6912a71294e6b66a5d59ee88007, "can: use skb hash
-  instead of private variable in headroom"), which is not available
-  before mainline v7.0. Added a local, static isotp_set_skb_uid() with
-  the same non-zero-unique-value behaviour (monotonic atomic counter,
-  no dependency on any version-specific RNG API) so the actual
-  skb->hash-based cfecho matching upstream introduces here needs no
-  further adaptation. The race fixes themselves are unaffected. ]
-
 Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
  net/can/isotp.c | 333 +++++++++++++++++++++++++++++++++++++++++---------------
