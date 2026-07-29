@@ -133,3 +133,13 @@ Stands jedes `backport`/`backport-isotp`-Branches, plus `master` als
 Referenz (`bcm-master.c`/`isotp-master.c`), benannt nach Branch
 (`bcm-510.c`, `bcm-618.c`, …). Zum direkten Nebeneinander-Vergleich
 aller Versionen, ohne zwischen Branches wechseln zu müssen.
+
+## finsrc2-isotp/
+
+Zweite Momentaufnahme derselben `isotp.c`-Branch-Tips, diesmal
+*nach* dem zusätzlichen Patch `can: isotp: fix timer drain order,
+wakeup handling and tx_gen ordering` (Commit
+`050f010f920da17c1044a4f174766ad553e770b6`). `finsrc-isotp/` bleibt
+unverändert als Vorher-Stand stehen, so dass sich beide Verzeichnisse
+gegeneinander diffen lassen, um genau zu sehen, was dieser eine Patch
+pro Branch verändert hat.
