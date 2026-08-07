@@ -243,22 +243,6 @@ static bool isotp_tx_gen_done(struct isotp_sock *so, u32 gen)
 	       READ_ONCE(so->tx_gen) != gen;
 }
 
-/* can_set_skb_uid() (from commit d4fb6514ff8ed6912a71294e6b66a5d59ee88007,
- * "can: use skb hash instead of private variable in headroom") is not
- * available before mainline v7.0 - provide the same non-zero unique
- * loopback echo identifier locally instead.
- */
-static atomic_t isotp_skb_uid_seq = ATOMIC_INIT(0);
-
-static void isotp_set_skb_uid(struct sk_buff *skb)
-{
-	/* create non-zero unique skb identifier together with *skb */
-	while (!(skb->hash))
-		skb->hash = atomic_inc_return(&isotp_skb_uid_seq);
-
-	skb->sw_hash = 1;
-}
-
 static inline struct isotp_sock *isotp_sk(const struct sock *sk)
 {
 	return (struct isotp_sock *)sk;
@@ -316,7 +300,6 @@ static int isotp_send_fc(struct sock *sk, int ae, u8 flowstatus)
 
 	can_skb_reserve(nskb);
 	can_skb_prv(nskb)->ifindex = dev->ifindex;
-	can_skb_prv(nskb)->skbcnt = 0;
 
 	nskb->dev = dev;
 	can_skb_set_owner(nskb, sk);
@@ -888,10 +871,9 @@ static void isotp_send_cframe(struct isotp_sock *so)
 
 	can_skb_reserve(skb);
 	can_skb_prv(skb)->ifindex = dev->ifindex;
-	can_skb_prv(skb)->skbcnt = 0;
 
 	/* set uid in tx skb to identify CF echo frames */
-	isotp_set_skb_uid(skb);
+	can_set_skb_uid(skb);
 
 	cf = (struct canfd_frame *)skb->data;
 	skb_put_zero(skb, so->ll.mtu);
@@ -1212,10 +1194,9 @@ static int isotp_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 
 	can_skb_reserve(skb);
 	can_skb_prv(skb)->ifindex = dev->ifindex;
-	can_skb_prv(skb)->skbcnt = 0;
 
 	/* set uid in tx skb to identify CF echo frames */
-	isotp_set_skb_uid(skb);
+	can_set_skb_uid(skb);
 
 	so->tx.len = size;
 	so->tx.idx = 0;
